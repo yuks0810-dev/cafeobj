@@ -1,0 +1,18 @@
+open NAT .
+    op cond : Bool Nat Nat -> Nat .
+    op g : Nat Nat -> Nat .
+    op oedc-fact : Nat -> Nat .
+    vars X Y : Nat . var NzX : NzNat .
+    -- cond
+    eq cond(true, X, Y) = X .
+    eq cond(false, X, Y) = Y .
+    -- g
+    eq g(X, Y) = X .
+    eq g(NzX, Y) = Y .
+    -- oedc-fact
+    eq oedc-fact(0) = 1 .
+    eq oedc-fact(NzX) = g(NzX, 1) .
+    -- test
+    red oedc-fact(0) . -- can be computed
+    red oedc-fact(10000) . -- can be computed
+close
