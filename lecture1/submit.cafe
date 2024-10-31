@@ -1,0 +1,79 @@
+-- 1. Factorial (factorial)
+open NAT .
+    op fact : Nat -> Nat .
+    var NzX : NzNat .
+    -- fact
+    eq fact(0) = 1 .
+    eq fact(NzX) = NzX * fact(p NzX) .
+    -- test
+    red fact(0) .
+    red fact(1) .
+    red fact(10) .
+    red fact(100) .
+    red fact(1000) .
+    -- red fact(10000) .
+close
+
+-- 2. Odd-Even Divide & Conquer Factorial (oedc-fact)
+open NAT .
+    op cond : Bool Nat Nat -> Nat .
+    op g : Nat Nat -> Nat .
+    op oedc-fact : Nat -> Nat .
+    vars X Y : Nat . var NzX : NzNat .
+    -- cond
+    eq cond(true, X, Y) = X .
+    eq cond(false, X, Y) = Y .
+    -- g
+    eq g(X, Y) = X .
+    eq g(NzX, Y) = Y .
+    -- oedc-fact
+    eq oedc-fact(0) = 1 .
+    eq oedc-fact(NzX) = g(NzX, 1) .
+    -- test
+    red oedc-fact(0) . -- can be computed
+    red oedc-fact(10000) . -- can be computed
+close
+
+-- 3. フィボナッチ数列の定義 (fibonacci)
+open NAT .
+    op fib : Nat -> Nat .
+    op sfib : Nat -> Nat .
+    var NzX : NzNat .
+    -- fib
+    eq fib(0) = 0 .
+    eq fib(NzX) = sfib(p NzX) .
+    -- sfib (sum of fibonacci)
+    eq sfib(0) = 1 .
+    eq sfib(NzX) = fib(NzX) + fib(p NzX) .
+    -- test
+    red fib(0) .
+    red fib(1) .
+    red fib(10) .
+    red fib(20) .
+    red fib(30) .
+close
+
+-- 4. アッカーマン関数の定義 (ackerman)
+open NAT .
+    op ack : Nat Nat -> Nat .
+    var Y : Nat .
+    vars NzX NzY : NzNat .
+    -- ack
+    eq ack(0, Y) = Y + 1 .
+    eq ack(NzX, 0) = ack(p NzX, 1) .
+    eq ack(NzX, NzY) = ack(p NzX, ack(NzX, p NzY)) .
+    -- test
+    red ack(0, 0) .
+    red ack(1, 1) .
+    red ack(2, 2) .
+    red ack(3, 3) .
+    
+    -- WARNING: This computation will cause memory overflow
+    -- Explanation: 
+    --     1. The recursive equation ack(NzX, NzY) = ack(p NzX, ack(NzX, p NzY))
+    --        creates nested calls that grow exponentially
+    --     2. Each recursive call generates multiple new Ackermann function calls
+    --     3. The stack space required grows beyond available memory
+    -- Therefore, computing ack(10, 10) is practically impossible
+    -- red ack(10, 10) .
+close
