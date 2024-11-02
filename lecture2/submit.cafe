@@ -108,4 +108,84 @@ open NATLIST .
     red hd(tl(nil)) .
     red hd(tl(0 | nil)) .
     red hd(tl(1 | 0 | nil)) .
+    red hd(tl(3 | 2 | 1 | 0 | nil)) .
 close
+
+-- Quick Sort
+mod! QSORT {
+    pr(NATLIST)
+    
+    op qsort : NatList -> NatList .
+    op partition : Nat NatList NatList NatList -> NatList .
+    
+    -- cafeObj vars
+    vars X Y : Nat .
+    vars L LL RL : NatList .
+    
+    -- Quick sort implementation
+    eq qsort(nil) = nil .
+    eq qsort(X | nil) = X | nil .
+    eq qsort(X | Y | L) = partition(X, Y | L, nil, nil) .
+
+    -- Partition implementation
+    eq partition(X, nil, LL, RL) = qsort(LL) @ (X | qsort(RL)) .
+    eq partition(X, Y | L, LL, RL) = if Y < X then {partition(X, L, Y | LL, RL)} else {partition(X, L, LL, Y | RL)} .
+}
+
+open QSORT .
+    red qsort(4 | 7 | 5 | 1 | 0 | 3 | 6 | 2 | nil) .
+close
+
+-- Sieve of Eratosthenes
+
+mod! ERATOSTHENES-SIEVE {
+    -- imports
+    pr(NATLIST)
+    -- signature
+    op primesUpto : Nat -> NatList .
+    op sieve : NatList -> NatList .
+    op check : Nat NatList -> NatList .
+    -- CafeOBJ vars
+    vars X Y : Nat .
+    var NzX : NzNat .
+    var L : NatList .
+    -- equations
+    -- primesUpto implementation
+    eq primesUpto(X) = sieve([2 .. X]) .
+    -- sieve implementation
+    eq sieve(nil) = nil .
+    eq sieve(X | L) = X | sieve(check(X, L)) .
+    -- check implementation
+    eq check(0, L) = L .
+    eq check(NzX, nil) = nil .
+    eq check(NzX, Y | L) = if NzX divides Y then {check(NzX, L)} else {Y | check(NzX, L)} .
+}
+
+open ERATOSTHENES-SIEVE .
+    red primesUpto(10) .
+    red primesUpto(20) .
+    red primesUpto(50) .
+    red primesUpto(100) .
+close
+
+-- Merge Sort
+-- mod! MERGE-SORT {
+--     pr(NATLIST)
+--     op merge : NatList NatList -> NatList .
+--     op split : NatList -> NatList NatList .
+--     vars L L1 L2 : NatList .
+--     eq merge(nil, nil) = nil .
+--     eq merge(nil, L) = L .
+--     eq merge(L, nil) = L .
+--     eq merge(X | L1, Y | L2) = if X < Y then {X | merge(L1, Y | L2)} else {Y | merge(X | L1, L2)} .
+--     eq split(nil) = nil | nil .
+--     eq split(X | nil) = X | nil | nil .
+--     eq split(X | Y | L) = X | L1 | L2 where L1 | L2 = split(L) .
+-- }
+
+-- open MERGE-SORT .
+--     red merge(1 | 3 | 5 | nil, 2 | 4 | 6 | nil) .
+--     red merge(1 | 3 | 5 | nil, 2 | 4 | 6 | 7 | nil) .
+--     red split(1 | 3 | 5 | 7 | 9 | 11 | 13 | 15 | nil) .
+--     red split(1 | 3 | 5 | 7 | 9 | 11 | 13 | 15 | 17 | nil) .
+-- close
