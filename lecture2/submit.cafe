@@ -168,24 +168,39 @@ open ERATOSTHENES-SIEVE .
     red primesUpto(100) .
 close
 
--- Merge Sort
--- mod! MERGE-SORT {
---     pr(NATLIST)
---     op merge : NatList NatList -> NatList .
---     op split : NatList -> NatList NatList .
---     vars L L1 L2 : NatList .
---     eq merge(nil, nil) = nil .
---     eq merge(nil, L) = L .
---     eq merge(L, nil) = L .
---     eq merge(X | L1, Y | L2) = if X < Y then {X | merge(L1, Y | L2)} else {Y | merge(X | L1, L2)} .
---     eq split(nil) = nil | nil .
---     eq split(X | nil) = X | nil | nil .
---     eq split(X | Y | L) = X | L1 | L2 where L1 | L2 = split(L) .
--- }
+mod! MERGE-SORT {
+    -- imports
+    pr(NATLIST)
 
--- open MERGE-SORT .
---     red merge(1 | 3 | 5 | nil, 2 | 4 | 6 | nil) .
---     red merge(1 | 3 | 5 | nil, 2 | 4 | 6 | 7 | nil) .
---     red split(1 | 3 | 5 | 7 | 9 | 11 | 13 | 15 | nil) .
---     red split(1 | 3 | 5 | 7 | 9 | 11 | 13 | 15 | 17 | nil) .
--- close
+    -- signature
+    [Pair]
+    [NatListPair]
+
+    -- define constructor
+    op <_,_> : NatList NatList -> NatListPair {constr}
+
+    -- define operators
+    op merge : NatList NatList -> NatList .
+    op split : NatList -> NatListPair .
+    op merge-sort : NatList -> NatList .
+
+    -- CafeOBJ vars
+    vars L L1 L2 : NatList .
+    var X Y : Nat .
+
+    -- define equations
+    eq merge(nil, nil) = nil .
+    eq merge(nil, L) = L .
+    eq merge(L, nil) = L .
+    eq merge(X | L1, Y | L2) = if X < Y then X | merge(L1, Y | L2) else Y | merge(X | L1, L2) fi .
+
+    -- define split function
+    eq split(nil) = <nil, nil> .
+    eq split(X | nil) = <X | nil, nil> .
+    eq split(X | Y | L) = <X | L1, Y | L2> where <L1, L2> = split(L) .
+
+    -- define merge-sort function
+    eq merge-sort(nil) = nil .
+    eq merge-sort(X | nil) = X | nil .
+    eq merge-sort(L) = merge(merge-sort(L1), merge-sort(L2)) where <L1, L2> = split(L) .
+}
