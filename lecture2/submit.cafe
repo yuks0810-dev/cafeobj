@@ -1,0 +1,111 @@
+mod! GCD {
+    -- imports
+    pr(NAT)
+    
+    -- signature
+    op gcd : Nat Zero -> Nat .
+    op gcd : Nat NzNat -> NzNat .
+    op gcd : Nat Nat -> Nat .
+    
+    -- CafeOBJ vars
+    var X : Nat .
+    var NzY : NzNat .
+    
+    -- equations
+    eq gcd(X,0) = X .
+    eq gcd(X, NzY) = gcd(NzY, X rem NzY) .
+}
+
+open GCD .
+    red gcd(24, 36) . -- compute the gcd of 24 & 36
+    red gcd(2015, 31031) . -- compute the gcd of 2015 & 31031
+close
+
+-- Module to calculate LCM (Least Common Multiple)
+mod! LCM {
+    pr(GCD)
+    op lcm : Nat Zero -> Nat .
+    op lcm : Nat NzNat -> Nat .
+    op lcm : Nat Nat -> Nat .
+
+    var X : Nat .
+    var NzY : NzNat .
+
+    eq lcm(X,0) = 0 .
+
+    -- quo is an operator for integer division (quotient). X quo Y returns the quotient of X divided by Y. For example, 10 quo 3 is 3.
+    eq lcm(X, NzY) = (X quo gcd(X, NzY)) * NzY .
+}
+
+open LCM .
+    red lcm(24, 36) .
+    red lcm(2015, 31031) .
+close
+
+-- Error or Exception Handling
+mod! NAT-ERR {
+    pr(NAT)
+    [Nat ErrNat < Nat&Err] .
+    op errNat : -> ErrNat {constr} . -- constructor for ErrNat
+    op p_ : Zero -> ErrNat .
+    op p_ : ErrNat -> ErrNat .
+    op p_ : Nat&Err -> Nat&Err .
+    op _quo_ : Nat&Err Zero -> ErrNat .
+    op _quo_ : Nat&Err ErrNat -> ErrNat .
+    op _quo_ : ErrNat Nat&Err -> ErrNat .
+    op _quo_ : Nat&Err Nat&Err -> Nat&Err .
+
+    var NE : Nat&Err .
+    eq p 0 = errNat .
+    eq p errNat = errNat .
+    eq NE quo 0 = errNat .
+    eq NE quo errNat = errNat .
+    eq errNat quo NE = errNat .
+}
+
+open NAT-ERR .
+    red p 1 .
+    red p 0 .
+    red p errNat .
+    red 10 quo 3 .
+    red 10 quo 0 .
+    red 10 quo errNat .
+    red errNat quo 3 .
+    red errNat quo errNat .
+close
+
+-- List of Natural Numbers
+mod! NATLIST {
+    pr(NAT-ERR)
+    [NatList]
+    [Nil NnNatList < NatList]
+
+    op nil : -> Nil {constr} .
+    op _|_ : Nat NatList -> NnNatList {constr} .
+    op hd : Nil -> ErrNat .
+    op hd : NnNatList -> Nat .
+    op hd : NatList -> Nat&Err .
+    op tl : NatList -> NatList .
+    op _@_ : NatList NatList -> NatList .
+    op [_.._] : Nat Nat -> NatList . -- Range operator
+    op if_then {_} else {_} : Bool NatList NatList -> NatList .
+    
+    vars X Y : Nat .
+    vars L L2 : NatList .
+
+    eq hd(nil) = errNat .
+    eq hd(X | L) = X .
+    eq tl(nil) = nil .
+    eq tl(X | L) = L .
+    eq nil @ L2 = L2 .
+    eq (X | L) @ L2 = X | (L @ L2) .
+    eq [X .. Y] = if X > Y then {nil} else {X | [X + 1 .. Y]} .
+    eq if true then {L} else {L2} = L .
+    eq if false then {L} else {L2} = L2 .
+}
+
+open NATLIST .
+    red hd(tl(nil)) .
+    red hd(tl(0 | nil)) .
+    red hd(tl(1 | 0 | nil)) .
+close
