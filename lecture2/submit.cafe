@@ -137,7 +137,6 @@ open QSORT .
 close
 
 -- Sieve of Eratosthenes
-
 mod! ERATOSTHENES-SIEVE {
     -- imports
     pr(NATLIST)
@@ -169,38 +168,80 @@ open ERATOSTHENES-SIEVE .
 close
 
 mod! MERGE-SORT {
-    -- imports
     pr(NATLIST)
-
-    -- signature
+    pr(NAT-ERR)
+    
     [Pair]
-    [NatListPair]
-
-    -- define constructor
-    op <_,_> : NatList NatList -> NatListPair {constr}
-
-    -- define operators
+    op <_,_> : NatList NatList -> Pair {constr}
+    op fst : Pair -> NatList .
+    op snd : Pair -> NatList .
+    
+    op mergeSort : NatList -> NatList .
     op merge : NatList NatList -> NatList .
-    op split : NatList -> NatListPair .
-    op merge-sort : NatList -> NatList .
-
-    -- CafeOBJ vars
+    op split : NatList -> Pair .
+    op check : Bool NatList -> NatList .
+    
+    -- Variable declarations
+    vars X Y : Nat .
     vars L L1 L2 : NatList .
-    var X Y : Nat .
-
-    -- define equations
-    eq merge(nil, nil) = nil .
-    eq merge(nil, L) = L .
-    eq merge(L, nil) = L .
-    eq merge(X | L1, Y | L2) = if X < Y then X | merge(L1, Y | L2) else Y | merge(X | L1, L2) fi .
-
-    -- define split function
-    eq split(nil) = <nil, nil> .
-    eq split(X | nil) = <X | nil, nil> .
-    eq split(X | Y | L) = <X | L1, Y | L2> where <L1, L2> = split(L) .
-
-    -- define merge-sort function
-    eq merge-sort(nil) = nil .
-    eq merge-sort(X | nil) = X | nil .
-    eq merge-sort(L) = merge(merge-sort(L1), merge-sort(L2)) where <L1, L2> = split(L) .
+    var P : Pair .
+    
+    -- Extract elements from Pair
+    -- ####################################################################################
+    -- this is the operator that extracts the first and second elements of a pair.
+    -- Using this operator, we can split a list into two lists. This is used to recursively sort the two halves of the list.
+    -- * fst extracts the first element of a pair.
+    -- * snd extracts the second element of a pair.
+    -- ####################################################################################
+    eq fst(< L1, L2 >) = L1 .
+    eq snd(< L1, L2 >) = L2 .
+    
+    -- Merge Sort implementation
+    -- ####################################################################################
+    -- this is the operator that recursively sorts the two halves of the list and merges them.
+    -- ####################################################################################
+    eq mergeSort(nil) = nil . -- if the list is empty, return an empty list
+    eq mergeSort(X | nil) = X | nil . -- if the list has only one element, return the element
+    eq mergeSort(L) = merge(mergeSort(fst(split(L))), mergeSort(snd(split(L)))) . -- recursively sort the two halves of the list and merge them
+    
+    -- Split list
+    eq split(L) = < check(true, L), check(false, L) > . -- split the list into two lists, one with elements that are true and one with elements that are false
+    
+    -- Check function for splitting
+    -- ####################################################################################
+    -- check(true, nil) and check(false, nil) are both needed
+    -- because check function might return an empty list for both true and false.
+    -- Therefore, it is needed to cover those two cases to ensure that the function works correctly.
+    -- ####################################################################################
+    eq check(true, nil) = nil . -- if the list is empty, return an empty list
+    eq check(false, nil) = nil . -- if the list is empty, return an empty list      
+    eq check(true, X | nil) = X | nil . -- if the list has only one element, return the element
+    eq check(false, X | nil) = nil . -- if the list has only one element, return an empty list
+    eq check(true, X | Y | L) = X | check(true, L) . -- if the list has more than one element, return the first element and recursively check the rest of the list
+    eq check(false, X | Y | L) = Y | check(false, L) . -- if the list has more than one element, return the second element and recursively check the rest of the list
+    
+    -- Merge operation
+    -- `then X | merge(L1, Y | L2)` : if the first element of the first list is less than or equal to the first element of the second list, return the first element and recursively merge the rest of the first list and the second list
+    -- `else Y | merge(X | L1, L2)` : if the first element of the first list is greater than the first element of the second list, return the second element and recursively merge the first list and the rest of the second list   
+    eq merge(L, nil) = L . -- if the first list is empty, return the second list
+    eq merge(nil, L) = L . -- if the second list is empty, return the first list
+    eq merge(X | L1, Y | L2) = 
+        if X <= Y 
+        then X | merge(L1, Y | L2) 
+        else Y | merge(X | L1, L2) 
+        fi .
 }
+
+open MERGE-SORT .
+    red mergeSort(4 | 7 | 5 | 1 | 0 | 3 | 6 | 2 | nil) . -- Case: Normal case
+    red mergeSort(9 | 8 | 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0 | nil) . -- Case: Reverse sorted list
+    red mergeSort(4 | 2 | 7 | 5 | 1 | 0 | 3 | 6 | 2 | nil) . -- Case: There is a pair of same numbner (2)
+    red mergeSort(5 | 5 | 5 | 5 | 5 | nil) . -- Case: All elements are the same
+    red mergeSort(0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | nil) . -- Case: Already sorted list
+    red mergeSort(1000000 | 200 | 500000 | 1 | 0 | 999999 | nil) . -- Case: Large numbers
+    red mergeSort(3 | 1 | 4 | 1 | 5 | 9 | nil) . -- Case: Odd number of elements
+    red mergeSort(8 | 6 | 7 | 5 | 3 | 0 | 9 | 2 | nil) . -- Case: Even number of elements
+    -- red mergeSort(empty) . -- Case: Empty list
+    -- red mergeSort(7 | nil) . -- Case: Single element list
+    -- red mergeSort(-5 | -10 | 0 | 5 | 10 | -1 | nil) . -- Case: List with negative numbers
+close
