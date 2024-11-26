@@ -116,7 +116,7 @@ mod! GLIST-ERR(E :: TRIV-ERR) {
     op _@_ : ErrList List&Err -> ErrList .
     op _@_ : List&Err ErrList -> ErrList .
     op _@_ : List&Err List&Err -> List&Err .
-    op if_then{_}else{_}else{_} : Bool List&Err List&Err -> List&Err .
+    op if_then{_}else{_} : Bool List&Err List&Err -> List&Err .
     var X : Elt.E .
     var XE : Elt&Err.E .
     vars L L2 : List .
@@ -133,8 +133,8 @@ mod! GLIST-ERR(E :: TRIV-ERR) {
     eq (X | L) @ L2 = X | (L @ L2) .
     eq errList @ LE = errList .
     eq LE @ errList = errList .
-    eq if true then{LE}else{LE2} = LE .
-    eq if false then{LE}else{LE2} = LE2 .
+    eq if true then {LE} else {LE2} = LE .
+    eq if false then {LE} else {LE2} = LE2 .
 }
 
 mod! NATLIST8 {
