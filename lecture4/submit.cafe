@@ -183,13 +183,35 @@ open NATLISTLIST1 .
     red tl((4 | 3 | nlnil) | (2 | 1 | 0 | nlnil) | nllnil) .
 close
 
+mod* TRIV-ERR-ORD {
+    [Elt Err < Elt&Err]
+    op err : -> Err .
+    op ord : Elt Elt -> Bool .
+}
 
 
+mod! GQSORT(E :: TRIV-ERR-ORD) {
+    pr(GLIST-ERR(E))
+    op qsort : List -> List .
+    op partition : Elt.E List List List -> List .
+    vars X Y : Elt.E .
+    vars L LL RL : List .
 
+    eq qsort(nil) = nil .
+    eq qsort(X | nil) = X | nil .
+    eq qsort(X | Y | L) = partition(X, Y | L, nil, nil) .
+    eq partition(X, nil, LL, RL) = qsort(LL) @ (X | qsort(RL)) .
+    eq partition(X, Y | L, LL, RL) = if ord.E(Y, X) then {partition(X, L, Y | LL, RL)} else {partition(X, L, LL, Y | RL)} .
+}
 
+view TRIV-ERR-ORD2NAT-ERR from TRIV-ERR-ORD to NAT-ERR {
+    sort Elt -> Nat,
+    sort Err -> ErrNat,
+    sort Elt&Err -> Nat&Err,
+    op err -> errNat,
+    op ord -> _<_,
+}
 
-
-
-
-
-
+open GQSORT(E <= TRIV-ERR-ORD2NAT-ERR) .
+    red qsort(4 | 7 | 5 | 1 | 0 | 3 | 6 | 2 | nil) .
+close
