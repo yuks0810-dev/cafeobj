@@ -215,3 +215,21 @@ view TRIV-ERR-ORD2NAT-ERR from TRIV-ERR-ORD to NAT-ERR {
 open GQSORT(E <= TRIV-ERR-ORD2NAT-ERR) .
     red qsort(4 | 7 | 5 | 1 | 0 | 3 | 6 | 2 | nil) .
 close
+
+mod! STRING-ERR {
+   pr(STRING)
+   [String ErrString < String&Err] 
+   op errStr : -> ErrString {constr} .
+}
+
+view TRIV-ERR-ORD2STRING-ERR from TRIV-ERR-ORD to STRING-ERR {
+    sort Elt -> String,
+    sort Err -> ErrString,
+    sort Elt&Err -> String&Err,
+    op err -> errStr,
+    op ord -> string<,
+}
+    
+open GQSORT(E <= TRIV-ERR-ORD2STRING-ERR) .
+    red qsort("Lisp" | "Python" | "Pascal" | "CafeOBJ" | "C" | "Java" | "Prolog" | "Fortran" | nil) .
+close
