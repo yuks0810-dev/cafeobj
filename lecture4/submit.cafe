@@ -308,3 +308,32 @@ open GQSORT(E <= TRIV-ERR-ORD2NATLIST9) .
                 (0 | nlnil) | nlnil | (1 | 1 | nlnil) | (3 | 0 | 1 | nlnil) |
                 (1 | 0 | nlnil) | nil) .
 close
+
+mod! STRLIST1 {
+    pr(GLIST-ERR-ORD(E <= TRIV-ERR-ORD2STRING-ERR)
+        * {
+            sort List -> StrList,
+            sort Nil -> SLNil,
+            sort NnList -> NnStrList,
+            sort ErrList -> ErrStrList,
+            sort List&Err -> StrList&Err,
+            op nil -> slnil,
+            op errList -> errStrList
+        }
+    )
+}
+
+view TRIV-ERR-ORD2STRLIST1 from TRIV-ERR-ORD to STRLIST1 {
+    sort Elt -> StrList,
+    sort Err -> ErrStrList,
+    sort Elt&Err -> StrList&Err,
+    op err -> errStrList,
+    op ord -> ord,
+}
+
+open GQSORT(E <= TRIV-ERR-ORD2STRLIST1) .
+    red qsort(("CafeOBJ" | "Fortran" | slnil) |
+            ("Java" | "C" | "Fortran" | slnil) | ("Fortran" | slnil) |
+            ("C" | slnil) | slnil | ("CafeOBJ" | "CafeOBJ" | slnil) |
+            ("Java" | "C" | "CafeOBJ" | slnil) | ("CafeOBJ" | "C" | slnil) | nil) .
+close
