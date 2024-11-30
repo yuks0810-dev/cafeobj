@@ -258,6 +258,7 @@ mod! GLIST-ERR-ORD(E :: TRIV-ERR-ORD) {
     op ord : List List -> Bool .
 
     var X : Elt.E .
+    var Y : Elt.E .
     var XE : Elt&Err.E .
     vars L L2 : List .
     vars LE LE2 : List&Err .
@@ -281,11 +282,29 @@ mod! GLIST-ERR-ORD(E :: TRIV-ERR-ORD) {
     eq ord(X | L, Y | L2) = ord.E(X, Y) or ((not ord.E(Y, X)) and ord(L, L2)) .
 } 
 
+mod! NATLIST9 {
+    pr(GLIST-ERR-ORD(E <= TRIV-ERR-ORD2NAT-ERR)
+    * {
+        sort List -> NatList,
+        sort Nil -> NLNil,
+        sort NnList -> NnNatList,
+        sort ErrList -> ErrNatList,
+        sort List&Err -> NatList&Err,
+        op nil -> nlnil,
+        op errList -> errNatList
+    })
+}
 
--- view TRIV-ERR-ORD2NATLISTLIST1 from TRIV-ERR-ORD to NATLISTLIST1 {
---     sort Elt -> NatListList,
---     sort Err -> ErrNatListList,
---     sort Elt&Err -> NatListList&Err,
---     op err -> errNatListList,
---     op ord -> string<,
--- }
+view TRIV-ERR-ORD2NATLIST9 from TRIV-ERR-ORD to NATLIST9 {
+    sort Elt -> NatList,
+    sort Err -> ErrNatList,
+    sort Elt&Err -> NatList&Err,
+    op err -> errNatList,
+    op ord -> ord,
+}
+
+open GQSORT(E <= TRIV-ERR-ORD2NATLIST9) .
+    red qsort((1 | 2 | nlnil ) | (3 | 0 | 2 | nlnil) | (2 | nlnil) | 
+                (0 | nlnil) | nlnil | (1 | 1 | nlnil) | (3 | 0 | 1 | nlnil) |
+                (1 | 0 | nlnil) | nil) .
+close
