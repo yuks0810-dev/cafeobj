@@ -1,3 +1,6 @@
+-- 1. Type each module used in the slides and some test code
+-- (enclosed with open and close) in one file and feed it into the CafeOBJ system.
+
 mod! GLIST1(E :: TRIV) {
     [Nil NnList < List]
     op nil : -> Nil {constr} .
@@ -337,3 +340,10 @@ open GQSORT(E <= TRIV-ERR-ORD2STRLIST1) .
             ("C" | slnil) | slnil | ("CafeOBJ" | "CafeOBJ" | slnil) |
             ("Java" | "C" | "CafeOBJ" | slnil) | ("CafeOBJ" | "C" | slnil) | nil) .
 close
+
+-- 2. Write a parametrized module in which the generic merge
+-- sort is described and some test code for lists of natural
+-- numbers, lists of strings, lists of lists of natural numbers and
+-- lists of lists of strings.
+
+
