@@ -331,7 +331,6 @@ view TRIV-ERR-ORD2STRLIST1 from TRIV-ERR-ORD to STRLIST1 {
     sort Err -> ErrStrList,
     sort Elt&Err -> StrList&Err,
     op err -> errStrList,
-    op ord -> ord,
 }
 
 open GQSORT(E <= TRIV-ERR-ORD2STRLIST1) .
@@ -347,3 +346,75 @@ close
 -- lists of lists of strings.
 
 
+mod! GMERGE-SORT(E :: TRIV-ERR-ORD) {
+    pr(GLIST-ERR-ORD(E))
+
+    [Pair]
+    op <_,_> : List List -> Pair {constr}
+    op fst : Pair -> List .
+    op snd : Pair -> List .
+    
+    op mergeSort : List -> List .
+    op merge : List List -> List .
+    op split : List -> Pair .
+    op check : Bool List -> List .
+    
+    vars X Y : Elt.E .
+    vars L L1 L2 : List .
+    var P : Pair .
+    
+    eq fst(< L1, L2 >) = L1 .
+    eq snd(< L1, L2 >) = L2 .
+    
+    eq mergeSort(nil) = nil .
+    eq mergeSort(X | nil) = X | nil .
+    eq mergeSort(X | Y | L) = merge(mergeSort(fst(split(X | Y | L))), mergeSort(snd(split(X | Y | L)))) .
+    eq split(L) = < check(true, L), check(false, L) > .
+    eq check(true, nil) = nil .
+    eq check(false, nil) = nil .      
+    eq check(true, X | nil) = X | nil .
+    eq check(false, X | nil) = nil .
+    eq check(true, X | Y | L) = X | check(true, L) .
+    eq check(false, X | Y | L) = Y | check(false, L) .
+    eq merge(L, nil) = L .
+    eq merge(nil, L) = L .
+    eq merge(X | L1, Y | L2) = if ord.E(X, Y) then X | merge(L1, Y | L2) else Y | merge(X | L1, L2) fi .
+}
+
+view TRIV-ERR-ORD2NATLIST-MERGE-SORT from TRIV-ERR-ORD to NATLIST9 {
+    sort Elt -> NatList,
+    sort Err -> ErrNatList,
+    sort Elt&Err -> NatList&Err,
+    op err -> errNatList,
+}
+
+-- view TRIV-ERR-ORD2STRLIST-MERGE-SORT from TRIV-ERR-ORD to STRLIST1 {
+--     sort Elt -> StrList,
+--     sort Err -> ErrStrList,
+--     sort Elt&Err -> StrList&Err,
+--     op err -> errStrList,
+-- }
+
+-- view TRIV-ERR-ORD2NATLISTLIST-MERGE-SORT from TRIV-ERR-ORD to NATLISTLIST1 {
+--     sort Elt -> NatListList,
+--     sort Err -> ErrNatListList,
+--     sort Elt&Err -> NatListList&Err,
+--     op err -> errNatListList,
+-- }
+
+-- view TRIV-ERR-ORD2STRLISTLIST-MERGE-SORT from TRIV-ERR-ORD to STRLISTLIST1 {
+--     sort Elt -> StrListList,
+--     sort Err -> ErrStrListList,
+--     sort Elt&Err -> StrListList&Err,
+--     op err -> errStrListList,
+-- }
+
+open GMERGE-SORT(E <= TRIV-ERR-ORD2NATLIST-MERGE-SORT) .
+    red mergeSort(4 | 7 | 5 | 1 | 0 | 3 | 6 | 2 | nlnil) .
+close
+
+-- open GMERGE-SORT(E <= TRIV-ERR-ORD2NATLIST-MERGE-SORT) .
+--     red mergeSort((1 | 2 | nlnil ) | (3 | 0 | 2 | nlnil) | (2 | nlnil) |
+--                 (0 | nlnil) | nlnil | (1 | 1 | nlnil) | (3 | 0 | 1 | nlnil) |
+--                 (1 | 0 | nlnil) | nil) .
+-- close
