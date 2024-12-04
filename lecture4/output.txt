@@ -1,18 +1,4 @@
-
--- loading standard prelude
-
-            -- CafeOBJ system Version 1.6.2(PigNose0.99) --
-                  built: 2024 Nov 26 Tue 13:41:00 GMT
-                         prelude file: std.bin
-                                  ***
-                     2024 Nov 30 Sat 15:24:45 GMT
-                            Type ? for help
-                                  ***
-                  -- Containing PigNose Extensions --
-                                  ---
-                             built on SBCL
-                             2.0.1.debian
-processing input : /work/lecture4/submit.cafe
+##### EXERCISE 1 #####
 
 -- defining module! GLIST1
 -- reading in file  : bool
@@ -86,7 +72,7 @@ processing input : /usr/local/share/cafeobj-1.6/lib/nznat.cafe
 (0.0000 sec for parse, 0.0000 sec for 1 rewrites + 1 matches)
 -- reduce in %NATLIST7 : (tl(((4 | (3 | nlnil)) @ (2 | (1 | (0 | nlnil)))))):NatList
 (3 | (2 | (1 | (0 | nlnil)))):NnNatList
-(0.0010 sec for parse, 0.0000 sec for 4 rewrites + 7 matches)
+(0.0000 sec for parse, 0.0000 sec for 4 rewrites + 7 matches)
 -- defining module! GLIST-ERR
 -- defining module! NATLIST8
 -- opening module NATLIST8
@@ -121,7 +107,7 @@ processing input : /usr/local/share/cafeobj-1.6/lib/nznat.cafe
 -- opening module GQSORT(E <= TRIV-ERR-ORD2NAT-ERR)
 -- reduce in %GQSORT(E <= TRIV-ERR-ORD2NAT-ERR) : (qsort((4 | (7 | (5 | (1 | (0 | (3 | (6 | (2 | nil)))))))))):List
 (0 | (1 | (2 | (3 | (4 | (5 | (6 | (7 | nil)))))))):List
-(0.0000 sec for parse, 0.0000 sec for 64 rewrites + 105 matches)
+(0.0000 sec for parse, 0.0010 sec for 64 rewrites + 105 matches)
 -- defining module! STRING-ERR
 -- reading in file  : string
 
@@ -140,16 +126,86 @@ processing input : /usr/local/share/cafeobj-1.6/lib/character.cafe
 -- opening module GQSORT(E <= TRIV-ERR-ORD2STRING-ERR)
 -- reduce in %GQSORT(E <= TRIV-ERR-ORD2STRING-ERR) : (qsort(("Lisp" | ("Python" | ("Pascal" | ("CafeOBJ" | ("C" | ("Java" | ("Prolog" | ("Fortran" | nil)))))))))):List
 ("C" | ("CafeOBJ" | ("Fortran" | ("Java" | ("Lisp" | ("Pascal" | ("Prolog" | ("Python" | nil)))))))):List
-(0.0000 sec for parse, 0.0000 sec for 64 rewrites + 102 matches)
+(0.0000 sec for parse, 0.0010 sec for 64 rewrites + 102 matches)
 -- defining module! GLIST-ERR-ORD
 -- defining module! NATLIST9
 -- opening module GQSORT(E <= TRIV-ERR-ORD2NATLIST9)
 -- reduce in %GQSORT(E <= TRIV-ERR-ORD2NATLIST9) : (qsort(((1 | (2 | nlnil)) | ((3 | (0 | (2 | nlnil))) | ((2 | nlnil) | ((0 | nlnil) | (nlnil | ((1 | (1 | nlnil)) | ((3 | (0 | (1 | nlnil))) | ((1 | (0 | nlnil)) | nil)))))))))):List
 (nlnil | ((0 | nlnil) | ((1 | (0 | nlnil)) | ((1 | (1 | nlnil)) | ((1 | (2 | nlnil)) | ((2 | nlnil) | ((3 | (0 | (1 | nlnil))) | ((3 | (0 | (2 | nlnil))) | nil)))))))):List
-(0.0010 sec for parse, 0.0010 sec for 183 rewrites + 335 matches)
+(0.0010 sec for parse, 0.0020 sec for 183 rewrites + 335 matches)
 -- defining module! STRLIST1
 -- opening module GQSORT(E <= TRIV-ERR-ORD2STRLIST1)
 -- reduce in %GQSORT(E <= TRIV-ERR-ORD2STRLIST1) : (qsort((("CafeOBJ" | ("Fortran" | slnil)) | (("Java" | ("C" | ("Fortran" | slnil))) | (("Fortran" | slnil) | (("C" | slnil) | (slnil | (("CafeOBJ" | ("CafeOBJ" | slnil)) | (("Java" | ("C" | ("CafeOBJ" | slnil))) | (("CafeOBJ" | ("C" | slnil)) | nil)))))))))):List
 (slnil | (("C" | slnil) | (("CafeOBJ" | ("C" | slnil)) | (("CafeOBJ" | ("CafeOBJ" | slnil)) | (("CafeOBJ" | ("Fortran" | slnil)) | (("Fortran" | slnil) | (("Java" | ("C" | ("CafeOBJ" | slnil))) | (("Java" | ("C" | ("Fortran" | slnil))) | nil)))))))):List
 (0.0000 sec for parse, 0.0010 sec for 183 rewrites + 329 matches)
-[Leaving CafeOBJ]
+
+
+##### EXERCISE 2
+
+##### EXERCISE 2: MERGE SORT NAT #####
+
+-- defining module! GLIST-ERR-ORD-MERGE-SORT
+-- opening module GLIST-ERR-ORD-MERGE-SORT(E <= TRIV-ERR-ORD2NAT-ERR)
+-- reduce in %GLIST-ERR-ORD-MERGE-SORT(E <= TRIV-ERR-ORD2NAT-ERR) : (mergeSort((4 | (7 | (5 | (1 | (0 | (3 | (6 | (2 | nil)))))))))):List
+(0 | (1 | (2 | (3 | (4 | (5 | (6 | (7 | nil)))))))):List
+(0.0000 sec for parse, 0.0020 sec for 246 rewrites + 558 matches)
+-- reduce in %GLIST-ERR-ORD-MERGE-SORT(E <= TRIV-ERR-ORD2NAT-ERR) : (mergeSort((9 | (8 | (7 | (6 | (5 | (4 | (3 | (2 | (1 | (0 | nil)))))))))))):List
+(0 | (1 | (2 | (3 | (4 | (5 | (6 | (7 | (8 | (9 | nil)))))))))):List
+(0.0000 sec for parse, 0.0020 sec for 360 rewrites + 797 matches)
+-- reduce in %GLIST-ERR-ORD-MERGE-SORT(E <= TRIV-ERR-ORD2NAT-ERR) : (mergeSort((4 | (2 | (7 | (5 | (1 | (0 | (3 | (6 | (2 | nil))))))))))):List
+(0 | (1 | (2 | (2 | (3 | (4 | (5 | (6 | (7 | nil))))))))):List
+(0.0000 sec for parse, 0.0010 sec for 293 rewrites + 667 matches)
+-- reduce in %GLIST-ERR-ORD-MERGE-SORT(E <= TRIV-ERR-ORD2NAT-ERR) : (mergeSort((5 | (5 | (5 | (5 | (5 | nil))))))):List
+(5 | (5 | (5 | (5 | (5 | nil))))):List
+(0.0000 sec for parse, 0.0000 sec for 121 rewrites + 294 matches)
+-- reduce in %GLIST-ERR-ORD-MERGE-SORT(E <= TRIV-ERR-ORD2NAT-ERR) : (mergeSort((0 | (1 | (2 | (3 | (4 | (5 | (6 | (7 | (8 | (9 | nil)))))))))))):List
+(0 | (1 | (2 | (3 | (4 | (5 | (6 | (7 | (8 | (9 | nil)))))))))):List
+(0.0010 sec for parse, 0.0010 sec for 360 rewrites + 807 matches)
+-- reduce in %GLIST-ERR-ORD-MERGE-SORT(E <= TRIV-ERR-ORD2NAT-ERR) : (mergeSort((1000000 | (200 | (500000 | (1 | (0 | (999999 | nil)))))))):List
+(0 | (1 | (200 | (500000 | (999999 | (1000000 | nil)))))):List
+(0.0000 sec for parse, 0.0010 sec for 164 rewrites + 370 matches)
+-- reduce in %GLIST-ERR-ORD-MERGE-SORT(E <= TRIV-ERR-ORD2NAT-ERR) : (mergeSort((3 | (1 | (4 | (1 | (5 | (9 | nil)))))))):List
+(1 | (1 | (3 | (4 | (5 | (9 | nil)))))):List
+(0.0000 sec for parse, 0.0010 sec for 172 rewrites + 385 matches)
+-- reduce in %GLIST-ERR-ORD-MERGE-SORT(E <= TRIV-ERR-ORD2NAT-ERR) : (mergeSort((8 | (6 | (7 | (5 | (3 | (0 | (9 | (2 | nil)))))))))):List
+(0 | (2 | (3 | (5 | (6 | (7 | (8 | (9 | nil)))))))):List
+(0.0000 sec for parse, 0.0010 sec for 246 rewrites + 553 matches)
+-- reduce in %GLIST-ERR-ORD-MERGE-SORT(E <= TRIV-ERR-ORD2NAT-ERR) : (mergeSort(nil)):List
+(nil):Nil
+(0.0000 sec for parse, 0.0000 sec for 1 rewrites + 1 match
+
+##### EXERCISE 2: MERGE SORT STRING #####
+
+-- opening module GLIST-ERR-ORD-MERGE-SORT(E <= TRIV-ERR-ORD2STRING-ERR)
+-- reduce in %GLIST-ERR-ORD-MERGE-SORT(E <= TRIV-ERR-ORD2STRING-ERR) : (mergeSort(("CafeOBJ" | ("Fortran" | ("Java" | ("C" | ("Python" | ("Lisp" | ("Prolog" | ("Pascal" | nil)))))))))):List
+("C" | ("CafeOBJ" | ("Fortran" | ("Java" | ("Lisp" | ("Pascal" | ("Prolog" | ("Python" | nil)))))))):List
+(0.0000 sec for parse, 0.0010 sec for 254 rewrites + 568 matches)
+-- reduce in %GLIST-ERR-ORD-MERGE-SORT(E <= TRIV-ERR-ORD2STRING-ERR) : (mergeSort(("Zebra" | ("Apple" | ("Orange" | ("Banana" | ("Grape" | nil))))))):List
+("Apple" | ("Banana" | ("Grape" | ("Orange" | ("Zebra" | nil))))):List
+(0.0000 sec for parse, 0.0000 sec for 113 rewrites + 261 matches)
+-- reduce in %GLIST-ERR-ORD-MERGE-SORT(E <= TRIV-ERR-ORD2STRING-ERR) : (mergeSort(("a" | ("b" | ("c" | ("d" | ("e" | nil))))))):List
+("a" | ("b" | ("c" | ("d" | ("e" | nil))))):List
+(0.0000 sec for parse, 0.0000 sec for 129 rewrites + 287 matches)
+-- reduce in %GLIST-ERR-ORD-MERGE-SORT(E <= TRIV-ERR-ORD2STRING-ERR) : (mergeSort(("e" | ("d" | ("c" | ("b" | ("a" | nil))))))):List
+("a" | ("b" | ("c" | ("d" | ("e" | nil))))):List
+(0.0000 sec for parse, 0.0000 sec for 129 rewrites + 283 matches)
+-- reduce in %GLIST-ERR-ORD-MERGE-SORT(E <= TRIV-ERR-ORD2STRING-ERR) : (mergeSort(("same" | ("same" | ("same" | nil))))):List
+("same" | ("same" | ("same" | nil))):List
+(0.0000 sec for parse, 0.0000 sec for 55 rewrites + 130 matches)
+-- reduce in %GLIST-ERR-ORD-MERGE-SORT(E <= TRIV-ERR-ORD2STRING-ERR) : (mergeSort(nil)):List
+(nil):Nil
+(0.0000 sec for parse, 0.0000 sec for 1 rewrites + 1 matches)
+
+##### EXERCISE 2: MERGE SORT NATLIST #####
+
+-- opening module GLIST-ERR-ORD-MERGE-SORT(E <= TRIV-ERR-ORD2NATLIST9)
+-- reduce in %GLIST-ERR-ORD-MERGE-SORT(E <= TRIV-ERR-ORD2NATLIST9) : (mergeSort(((1 | (2 | nlnil)) | ((3 | (0 | (2 | nlnil))) | ((2 | nlnil) | ((0 | nlnil) | (nlnil | ((1 | (1 | nlnil)) | ((3 | (0 | (1 | nlnil))) | ((1 | (0 | nlnil)) | nil)))))))))):List
+(nlnil | ((0 | nlnil) | ((1 | (0 | nlnil)) | ((1 | (1 | nlnil)) | ((1 | (2 | nlnil)) | ((2 | nlnil) | ((3 | (0 | (1 | nlnil))) | ((3 | (0 | (2 | nlnil))) | nil)))))))):List
+(0.0010 sec for parse, 0.0030 sec for 512 rewrites + 1078 matches)
+
+##### EXERCISE 2: MERGE SORT STRLIST #####
+
+-- opening module GLIST-ERR-ORD-MERGE-SORT(E <= TRIV-ERR-ORD2STRLIST1)
+-- reduce in %GLIST-ERR-ORD-MERGE-SORT(E <= TRIV-ERR-ORD2STRLIST1) : (mergeSort((("CafeOBJ" | ("Fortran" | slnil)) | (("Java" | ("C" | ("Fortran" | slnil))) | (("Fortran" | slnil) | (("C" | slnil) | (slnil | (("CafeOBJ" | ("CafeOBJ" | slnil)) | (("Java" | ("C" | ("CafeOBJ" | slnil))) | (("CafeOBJ" | ("C" | slnil)) | nil)))))))))):List
+(slnil | (("C" | slnil) | (("CafeOBJ" | ("C" | slnil)) | (("CafeOBJ" | ("CafeOBJ" | slnil)) | (("CafeOBJ" | ("Fortran" | slnil)) | (("Fortran" | slnil) | (("Java" | ("C" | ("CafeOBJ" | slnil))) | (("Java" | ("C" | ("Fortran" | slnil))) | nil)))))))):List
+(0.0000 sec for parse, 0.0030 sec for 512 rewrites + 1064 matches)
