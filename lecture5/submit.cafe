@@ -1,17 +1,16 @@
-mod! PAIR(FE : TRIV, SE :: TRIV) {
-    [Pair]
-    op(_,_) : Elt.FE Elt.SE -> Pair {constr}
-}
 
+mod! PAIR(FE :: TRIV, SE :: TRIV) {
+  [Pair]
+  op (_,_) : Elt.FE Elt.SE -> Pair {constr} .
+}
 mod! TRIPLE(FE :: TRIV, SE :: TRIV, TE :: TRIV) {
     [Triple]
-    op(_,_,_) : Elt.FE Elt.SE Elt.TE -> Triple {constr} .
+    op (_,_,_) : Elt.FE Elt.SE Elt.TE -> Triple {constr} .
 }
-
 mod* TRIV-ERR-IF {
     [Elt Err < Elt&Err]
     op err : -> Err .
-    op if_then {_} else {_} : Bool Elt&Err Elt&Err -> Elt&Err .
+    op if_then{_}else{_} : Bool Elt&Err Elt&Err -> Elt&Err .
 }
 
 mod! ENTRY(K :: TRIV, V :: TRIV-ERR-IF) {
@@ -26,39 +25,44 @@ mod! ENTRY(K :: TRIV, V :: TRIV-ERR-IF) {
 mod* TRIV-ERR {
     [Elt Err < Elt&Err]
     op err : -> Err .
-} 
+}
 
 mod! GLIST-ERR(E :: TRIV-ERR) {
   [Nil NnList < List]
   [List ErrList < List&Err]
   op errList : -> ErrList {constr} .
-  op nil : -> Nil   {constr} .
+  op nil : -> Nil {constr} .
   op _|_ : Elt.E List -> List {constr} .
   op _|_ : Elt&Err.E List&Err -> List&Err .
   op _@_ : List List -> List .
-  op _@_ :  List&Err List&Err -> List&Err .
-  op if_then {_} else {_} : Bool List&Err List&Err -> List&Err .
+  op _@_ : List&Err List&Err -> List&Err .
+  op if_then{_}else{_}
+  : Bool List&Err List&Err -> List&Err .
   var X : Elt.E .
   var XE : Elt&Err.E .
   vars L L2 : List .
   vars LE LE2 : List&Err .
+  -- _|_
   eq err.E | LE = errList .
   eq XE | errList = errList .
+  -- _@_
   eq nil @ L2 = L2 .
   eq (X | L) @ L2 = X | (L @ L2) .
   eq errList @ LE = errList .
   eq LE @ errList = errList .
+  -- if_then{_}else{_}
   eq if true then {LE} else {LE2} = LE .
   eq if false then {LE} else {LE2} = LE2 .
 }
 
 mod! BOOL-ERR {
-    [Bool ErrBool < Bool&Err]
-    op errBool : -> ErrBool {constr} .
-    op if_then {_} else {_} : Bool Bool Bool -> Bool .
-    vars B1 B2 : Bool .
-    eq if true then {B1} else {B2} = B1 .
-    eq if false then {B1} else {B2} = B2 .
+  [Bool ErrBool < Bool&Err]
+  op errBool : -> ErrBool {constr} .
+  op if_then{_}else{_} : Bool Bool Bool -> Bool .
+  vars B1 B2 : Bool .
+  -- if_then{_}else{_}
+  eq if true then {B1} else {B2} = B1 .
+  eq if false then {B1} else {B2} = B2 .
 }
 
 mod! NAT-ERR principal-sort Nat {
@@ -158,11 +162,11 @@ view TRIV2QID from TRIV to QID {
 }
 
 view TRIV-ERR-IF2STRING-ERR from TRIV-ERR-IF to STRING-ERR {
-  sort Elt -> String,
-  sort Err -> ErrString,
-  sort Elt&Err -> String&Err,
-  op err -> errStr,
-  op (if_then {_} else {_}) -> (if_then {_} else {_}),
+    sort Elt -> String,
+    sort Err -> ErrString,
+    sort Elt&Err -> String&Err,
+    op err -> errStr,
+    op (if_then{_}else{_}) -> (if_then{_}else{_}),
 }
 
 open TABLE(K <= TRIV2QID, V <= TRIV-ERR-IF2STRING-ERR) .
@@ -184,20 +188,20 @@ open TABLE(K <= TRIV2QID, V <= TRIV-ERR-IF2STRING-ERR) .
 close
 
 mod! TAG {
-    pr(PAIR(STRING-ERR, NAT-ERR) * {sort Pair -> Tag})
-    [Tag ErrTag < Tag&Err]
-    op errTag : -> ErrTag {constr} .
-    op (_,_) : String&Err Nat&Err -> Tag&Err .
-    op if_then {_} else {_} : Bool Tag&Err Tag&Err -> Tag&Err .
-    var SE : String&Err .
-    var NE : Nat&Err .
-    vars TE1 TE2 : Tag&Err .
-
-    eq(errStr, NE) = errTag .
-    eq(SE, errNat) = errTag .
-
-    eq if true then {TE1} else {TE2} = TE1 .
-    eq if false then {TE1} else {TE2} = TE2 .
+  pr(PAIR(STRING-ERR,NAT-ERR) * {sort Pair -> Tag} )
+  [Tag ErrTag < Tag&Err]
+  op errTag : -> ErrTag {constr} .
+  op (_,_) : String&Err Nat&Err -> Tag&Err .
+  op if_then{_}else{_} : Bool Tag&Err Tag&Err -> Tag&Err .
+  var SE : String&Err .
+  var NE : Nat&Err .
+  vars TE1 TE2 : Tag&Err .
+  -- (_,_)
+  eq (errStr,NE) = errTag .
+  eq (SE,errNat) = errTag .
+  -- if_then{_}else{_}
+  eq if true then {TE1} else {TE2} = TE1 .
+  eq if false then {TE1} else {TE2} = TE2 .
 }
 
 view TRIV-ERR-IF2TAG from TRIV-ERR-IF to TAG {
@@ -205,7 +209,7 @@ view TRIV-ERR-IF2TAG from TRIV-ERR-IF to TAG {
   sort Err -> ErrTag,
   sort Elt&Err -> Tag&Err,
   op err -> errTag,
-  op (if_then {_} else {_}) -> (if_then {_} else {_})
+  op (if_then{_}else{_}) -> (if_then{_}else{_})
 }
 
 mod! CATALOG {
@@ -220,14 +224,48 @@ mod! CATALOG {
       })
 }
 
-open CATALOG .
-  op cat : -> Catalog .
-  eq cat = ('a, ("apple", 150)) | ('o,("orange", 100)) | ('t, ("tomato", 90)) | empCatalog .
-  red cat .
-close
+mod! CATALOG {
+  pr(TABLE(K <= TRIV2QID, V <= TRIV-ERR-IF2TAG) * {
+    sort Table -> Catalog, 
+    sort EmpTable -> EmpCatalog,
+    sort NeTable -> NeCatalog, 
+    sort ErrTable -> ErrCatalog,
+    sort Table&Err -> Catalog&Err, 
+    op empTable -> empCatalog,
+    op errTable -> errCatalog 
+  }
+  )
+}
 
+mod! CART-ITEM {
+  pr(PAIR(QID,NAT-ERR) * {sort Pair -> CItem})
+  [CItem ErrCItem < CItem&Err]
+  op errCItem : -> ErrCItem {constr} .
+}
 
+view TRIV-ERR2CART-ITEM from TRIV-ERR to CART-ITEM {
+    sort Elt -> CItem,
+    sort Err -> ErrCItem,
+    sort Elt&Err -> CItem&Err,
+    op err -> errCItem,
+}
 
-
-
-
+mod! CART { pr(GLIST-ERR(E <= TRIV-ERR2CART-ITEM) * {
+    sort List -> Cart, 
+    sort Nil -> EmpCart,
+    sort NnList -> NeCart, 
+    sort ErrList -> ErrCart,
+    sort List&Err -> Cart&Err, 
+    op nil -> empCart,
+    op errList -> errCart 
+  })
+  op norm : Cart -> Cart .
+  op mkCart : Cart CItem -> Cart .
+  vars I I2 : Qid . vars N N2 : Nat . var C : Cart .
+  -- norm
+  eq norm(empCart) = empCart .
+  eq norm((I,N) | C) = mkCart(norm(C),(I,N)) .
+  -- mkCart
+  eq mkCart(empCart,(I,N)) = (I,N) | empCart .
+  eq mkCart((I2,N2) | C,(I,N)) = if I == I2 then {(I,N + N2) | C} else {(I2,N2) | mkCart(C,(I,N))} .
+}
