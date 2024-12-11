@@ -269,3 +269,103 @@ mod! CART { pr(GLIST-ERR(E <= TRIV-ERR2CART-ITEM) * {
   eq mkCart(empCart,(I,N)) = (I,N) | empCart .
   eq mkCart((I2,N2) | C,(I,N)) = if I == I2 then {(I,N + N2) | C} else {(I2,N2) | mkCart(C,(I,N))} .
 }
+
+open CART .
+  op c : -> Cart .
+  eq c = ('o,4) | ('t,10) | ('o,6) | empCart .
+  red norm(c) .
+close
+
+mod! BILL-ITEM { pr(TRIPLE(STRING-ERR,NAT-ERR,NAT-ERR) * {sort Triple -> BItem})
+  [BItem ErrBItem < BItem&Err]
+  op errBItem : -> ErrBItem {constr} .
+  op (_,_,_) : String&Err Nat&Err Nat&Err -> BItem&Err .
+  var SE : String&Err . vars NE1 NE2 : Nat&Err .
+  eq (errStr,NE1,NE2) = errBItem .
+  eq (SE,errNat,NE2) = errBItem .
+  eq (SE,NE1,errNat) = errBItem .
+}
+
+view TRIV-ERR2BILL-ITEM from TRIV-ERR to BILL-ITEM {
+  sort Elt -> BItem,
+  sort Err -> ErrBItem,
+  sort Elt&Err -> BItem&Err,
+  op err -> errBItem 
+}
+
+mod! BILL-ITEM { pr(TRIPLE(STRING-ERR,NAT-ERR,NAT-ERR) * {sort Triple -> BItem})
+  [BItem ErrBItem < BItem&Err]
+  op errBItem : -> ErrBItem {constr} .
+  op (_,_,_) : String&Err Nat&Err Nat&Err -> BItem&Err .
+  var SE : String&Err . vars NE1 NE2 : Nat&Err .
+  eq (errStr,NE1,NE2) = errBItem .
+  eq (SE,errNat,NE2) = errBItem .
+  eq (SE,NE1,errNat) = errBItem .
+}
+
+view TRIV-ERR2BILL-ITEM from TRIV-ERR to BILL-ITEM {
+  sort Elt -> BItem,
+  sort Err -> ErrBItem,
+  sort Elt&Err -> BItem&Err,
+  op err -> errBItem 
+}
+
+mod! BILIST principal-sort BIList {
+  pr(GLIST-ERR(E <= TRIV-ERR2BILL-ITEM) * {
+  sort List -> BIList, sort Nil -> NilBIList, sort NnList -> NnBIList,
+  sort ErrList -> ErrBIList, sort List&Err -> BIList&Err,
+  op nil -> nilBIL, op errList -> errBIL, } )
+  op total : BIList -> Nat .
+  op total : BIList&Err -> Nat&Err .
+  var S : String . vars N ST : Nat . var BIL : BIList .
+  eq total(errBIL) = errNat .
+  eq total(nilBIL) = 0 .
+  eq total((S,N,ST) | BIL) = ST + total(BIL) .
+}
+
+mod! BILL { pr(CATALOG) pr(CART)
+  pr(PAIR(BILIST,NAT-ERR) * {sort Pair -> Bill})
+  [Bill ErrBill < Bill&Err]
+  op errBill : -> ErrBill {constr} .
+  op (_,_) : BIList&Err Nat&Err -> Bill&Err .
+  op mkBill : Catalog Cart -> Bill&Err .
+  op mkSubBill : BIList&Err -> Bill&Err .
+  op mkBIL : Catalog Cart -> BIList&Err .
+  op mkSubBIL : Tag&Err Catalog Cart Nat -> BIList&Err .
+  var BILE : BIList&Err . var BIL : BIList . var NE : Nat&Err .
+  var CAT : Catalog . var I : Qid . vars N P : Nat .
+  var IN : String . var C : Cart .
+  -- (_,_)
+  eq (errBIL,NE) = errBill .
+  eq (BILE,errNat) = errBill .
+  -- mkBill
+  eq mkBill(CAT,C) = mkSubBill(mkBIL(CAT,norm(C))) .
+  -- mkSubBill
+  eq mkSubBill(errBIL) = errBill .
+  eq mkSubBill(BIL) = (BIL,total(BIL)) .
+  -- mkBIL
+  eq mkBIL(CAT,empCart) = nilBIL .
+  eq mkBIL(CAT,(I,N) | C) = mkSubBIL(lookup(CAT,I),CAT,C,N) .
+  -- mkSubBIL
+  eq mkSubBIL(errTag,CAT,C,N) = errBIL .
+  eq mkSubBIL((IN,P),CAT,C,N) = (IN,N,N * P) | mkBIL(CAT,C) .
+}
+
+open BILL .
+  op cat : -> Catalog .
+  eq cat = ('a,("apple",150)) | ('o,("orange",100)) | ('t,("tomato",90)) | empCatalog .
+  op c : -> Cart .
+  eq c = ('o,4) | ('t,10) | ('o,6) | empCart .
+  red mkBill(cat,c) .
+close
+
+open BILL .
+  op cat : -> Catalog .
+  ops c1 c2 : -> Cart .
+  eq cat = ('a,("apple",150)) | ('o,("orange",100)) | ('t,("tomato",90)) |
+  ('b,("banana",140)) | ('p,("potato",30)) | empCatalog .
+  eq c1 = ('p,3) | ('o,2) | ('a,3) | ('p,10) | ('b,10) | ('o,10) | ('t,20) | empCart .
+  eq c2 = ('p,3) | ('o,2) | ('f,10) | ('a,3) | empCart .
+  red mkBill(cat,c1) .
+  red mkBill(cat,c2) .
+close
