@@ -106,8 +106,8 @@ mod! TABLE {
 
   op singleton : Elt.K Elt.V -> Table .
   op singleton : Elt.K Elt&Err.V -> Table&Err .
-  op singleton(K, err.V) = errTable . 
-  op singleton(K, V) = (K, V) | empTable .
+  eq singleton(K, err.V) = errTable . 
+  eq singleton(K, V) = (K, V) | empTable .
 
   op isReg : Table Elt.K -> Bool .
   op isReg : Table&Err Elt.K -> Bool&Err .

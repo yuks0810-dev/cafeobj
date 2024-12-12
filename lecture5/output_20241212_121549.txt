@@ -1,4 +1,19 @@
-##### EXCERSES
+
+-- loading standard prelude
+
+            -- CafeOBJ system Version 1.6.2(PigNose0.99) --
+                   built: 2024 Dec 4 Wed 6:02:57 GMT
+                         prelude file: std.bin
+                                  ***
+                     2024 Dec 12 Thu 12:16:16 GMT
+                            Type ? for help
+                                  ***
+                  -- Containing PigNose Extensions --
+                                  ---
+                             built on SBCL
+                             2.0.1.debian
+processing input : /work/lecture5/submit.cafe
+
 -- defining module! PAIR
 -- reading in file  : bool
 
@@ -71,44 +86,44 @@ processing input : /usr/local/share/cafeobj-1.6/lib/qid.cafe
 
 -- opening module TABLE(K <= TRIV2QID, V <= TRIV-ERR-IF2STRING-ERR)
 -- reduce in %TABLE(K <= TRIV2QID, V <= TRIV-ERR-IF2STRING-ERR) : (t):Table
-(update(update(singleton('java,"Java"),'obj,"OBJ3"),'c,"C")):Table
-(0.0000 sec for parse, 0.0000 sec for 1 rewrites + 5 matches)
--- reduce in %TABLE(K <= TRIV2QID, V <= TRIV-ERR-IF2STRING-ERR) : (isReg(t,'obj)):Bool&Err
-(isReg(update(update(singleton('java,"Java"),'obj,"OBJ3"),'c,"C"),'obj)):Bool&Err
-(0.0000 sec for parse, 0.0000 sec for 1 rewrites + 11 matches)
--- reduce in %TABLE(K <= TRIV2QID, V <= TRIV-ERR-IF2STRING-ERR) : (isReg(t,'mk)):Bool&Err
-(isReg(update(update(singleton('java,"Java"),'obj,"OBJ3"),'c,"C"),'mk)):Bool&Err
-(0.0000 sec for parse, 0.0000 sec for 1 rewrites + 11 matches)
+(('java , "Java") | (('obj , "OBJ3") | (('c , "C") | empTable))):Table
+(0.0000 sec for parse, 0.0000 sec for 13 rewrites + 19 matches)
+-- reduce in %TABLE(K <= TRIV2QID, V <= TRIV-ERR-IF2STRING-ERR) : (isReg(t,'obj)):Bool
+(true):Bool
+(0.0000 sec for parse, 0.0000 sec for 19 rewrites + 28 matches)
+-- reduce in %TABLE(K <= TRIV2QID, V <= TRIV-ERR-IF2STRING-ERR) : (isReg(t,'mk)):Bool
+(false):Bool
+(0.0000 sec for parse, 0.0000 sec for 23 rewrites + 35 matches)
 -- reduce in %TABLE(K <= TRIV2QID, V <= TRIV-ERR-IF2STRING-ERR) : (lookup(t,'obj)):String&Err
-(lookup(update(update(singleton('java,"Java"),'obj,"OBJ3"),'c,"C"),'obj)):String&Err
-(0.0000 sec for parse, 0.0000 sec for 1 rewrites + 7 matches)
+("OBJ3"):String
+(0.0000 sec for parse, 0.0000 sec for 23 rewrites + 34 matches)
 -- reduce in %TABLE(K <= TRIV2QID, V <= TRIV-ERR-IF2STRING-ERR) : (lookup(t,'mk)):String&Err
-(lookup(update(update(singleton('java,"Java"),'obj,"OBJ3"),'c,"C"),'mk)):String&Err
-(0.0000 sec for parse, 0.0000 sec for 1 rewrites + 7 matches)
+(errStr):ErrString
+(0.0000 sec for parse, 0.0000 sec for 23 rewrites + 35 matches)
 -- reduce in %TABLE(K <= TRIV2QID, V <= TRIV-ERR-IF2STRING-ERR) : (update(t,'mk,"SML#")):Table
-(update(update(update(singleton('java,"Java"),'obj,"OBJ3"),'c,"C"),'mk,"SML#")):Table
-(0.0000 sec for parse, 0.0000 sec for 1 rewrites + 7 matches)
+(('java , "Java") | (('obj , "OBJ3") | (('c , "C") | (('mk , "SML#") | empTable)))):Table
+(0.0000 sec for parse, 0.0000 sec for 23 rewrites + 35 matches)
 -- reduce in %TABLE(K <= TRIV2QID, V <= TRIV-ERR-IF2STRING-ERR) : (update(t,'obj,"CafeOBJ")):Table
-(update(update(update(singleton('java,"Java"),'obj,"OBJ3"),'c,"C"),'obj,"CafeOBJ")):Table
-(0.0000 sec for parse, 0.0000 sec for 1 rewrites + 7 matches)
+(('java , "Java") | (('obj , "CafeOBJ") | (('c , "C") | empTable))):Table
+(0.0000 sec for parse, 0.0010 sec for 19 rewrites + 28 matches)
 -- reduce in %TABLE(K <= TRIV2QID, V <= TRIV-ERR-IF2STRING-ERR) : (insert(t,'mk,"SML#")):Table&Err
-(if isReg(update(update(singleton('java,"Java"),'obj,"OBJ3"),'c,"C"),'mk) then { errTable } else { (('mk , "SML#") | update(update(singleton('java,"Java"),'obj,"OBJ3"),'c,"C")) }):?Table&Err
-(0.0000 sec for parse, 0.0000 sec for 2 rewrites + 16 matches)
+(('mk , "SML#") | (('java , "Java") | (('obj , "OBJ3") | (('c , "C") | empTable)))):Table
+(0.0000 sec for parse, 0.0000 sec for 25 rewrites + 38 matches)
 -- reduce in %TABLE(K <= TRIV2QID, V <= TRIV-ERR-IF2STRING-ERR) : (insert(t,'obj,"CafeOBJ")):Table&Err
-(if isReg(update(update(singleton('java,"Java"),'obj,"OBJ3"),'c,"C"),'obj) then { errTable } else { (('obj , "CafeOBJ") | update(update(singleton('java,"Java"),'obj,"OBJ3"),'c,"C")) }):?Table&Err
-(0.0000 sec for parse, 0.0000 sec for 2 rewrites + 16 matches)
+(errTable):ErrTable
+(0.0000 sec for parse, 0.0000 sec for 21 rewrites + 30 matches)
 -- reduce in %TABLE(K <= TRIV2QID, V <= TRIV-ERR-IF2STRING-ERR) : (remove(t,'mk)):Table
-(remove(update(update(singleton('java,"Java"),'obj,"OBJ3"),'c,"C"),'mk)):Table
-(0.0000 sec for parse, 0.0000 sec for 1 rewrites + 7 matches)
+(('java , "Java") | (('obj , "OBJ3") | (('c , "C") | empTable))):Table
+(0.0000 sec for parse, 0.0000 sec for 23 rewrites + 35 matches)
 -- reduce in %TABLE(K <= TRIV2QID, V <= TRIV-ERR-IF2STRING-ERR) : (remove(t,'obj)):Table
-(remove(update(update(singleton('java,"Java"),'obj,"OBJ3"),'c,"C"),'obj)):Table
-(0.0000 sec for parse, 0.0000 sec for 1 rewrites + 7 matches)
+(('java , "Java") | (('c , "C") | empTable)):Table
+(0.0000 sec for parse, 0.0010 sec for 19 rewrites + 28 matches)
 -- reduce in %TABLE(K <= TRIV2QID, V <= TRIV-ERR-IF2STRING-ERR) : (delete(t,'mk)):Table&Err
 (errTable):ErrTable
-(0.0000 sec for parse, 0.0000 sec for 4 rewrites + 19 matches)
+(0.0000 sec for parse, 0.0000 sec for 26 rewrites + 39 matches)
 -- reduce in %TABLE(K <= TRIV2QID, V <= TRIV-ERR-IF2STRING-ERR) : (delete(t,'obj)):Table&Err
-(errTable):ErrTable
-(0.0000 sec for parse, 0.0000 sec for 4 rewrites + 19 matches)
+(('java , "Java") | (('c , "C") | empTable)):Table
+(0.0000 sec for parse, 0.0000 sec for 28 rewrites + 40 matches)
 -- defining module! TAG
 -- defining module! CATALOG
 -- defining module! CATALOG
@@ -125,12 +140,11 @@ processing input : /usr/local/share/cafeobj-1.6/lib/qid.cafe
 -- opening module BILL
 -- reduce in %BILL : (mkBill(cat,c)):Bill&Err
 ((("orange" , 10 , 1000) | (("tomato" , 10 , 900) | nilBIL)) , 1900):Bill
-(0.0000 sec for parse, 0.0010 sec for 49 rewrites + 76 matches)
+(0.0000 sec for parse, 0.0000 sec for 49 rewrites + 76 matches)
 -- opening module BILL
 -- reduce in %BILL : (mkBill(cat,c1)):Bill&Err
 ((("tomato" , 20 , 1800) | (("orange" , 12 , 1200) | (("banana" , 10 , 1400) | (("potato" , 13 , 390) | (("apple" , 3 , 450) | nilBIL))))) , 5240):Bill
-(0.0000 sec for parse, 0.0000 sec for 174 rewrites + 282 matches)
+(0.0000 sec for parse, 0.0010 sec for 174 rewrites + 282 matches)
 -- reduce in %BILL : (mkBill(cat,c2)):Bill&Err
 (errBill):ErrBill
 (0.0000 sec for parse, 0.0010 sec for 69 rewrites + 108 matches)
-[Leaving CafeOBJ]
