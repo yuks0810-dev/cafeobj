@@ -195,7 +195,11 @@ mod! COMP {
 mod! SCHED {
   pr(NAT)
   pr(INF-LIST(TID) * {sort InfList -> Sched} )
+  op if_then{_}else{_} : Bool Sched Sched -> Sched .
   op sched : Nat -> Sched .
+  vars IL1 IL2 : Sched .
+  eq if true then {IL1} else {IL2} = IL1 .
+  eq if false then {IL1} else {IL2} = IL2 .
   var N : Nat .
   eq sched(N) = if 2 divides N then {t1 | sched(N quo 2)} else {t2 | sched(N quo 2)} .
 }
