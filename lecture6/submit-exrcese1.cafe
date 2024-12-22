@@ -152,12 +152,12 @@ mod! LOC {
 mod! STATE principal-sort State {
   pr(LOC)
   [State]
-  op (locked:_,pc1:_,pc2:_,pc3:_,pc4:_) : Bool Loc Loc Loc Loc -> State {constr} .
+  op (locked:_,pc1:_,pc2:_) : Bool Loc Loc -> State {constr} .
 }
 
 mod! TID {
   [Tid]
-  ops t1 t2 t3 t4 : -> Tid {constr} .
+  ops t1 t2 : -> Tid {constr} .
   op if_then{_}else{_} : Bool Tid Tid -> Tid .
   vars T1 T2 : Tid .
   eq if true then {T1} else {T2} = T1 .
@@ -166,46 +166,26 @@ mod! TID {
 
 mod! FMUTEX { pr(STATE) pr(TID)
   op trans : State Tid -> State .
-  vars L1 L2 L3 L4 : Loc . var B : Bool .
-
+  vars L1 L2 : Loc . var B : Bool .
   -- t1
-  eq trans((locked: true, pc1: rs, pc2: L2, pc3: L3, pc4: L4), t1) = 
-    (locked: true, pc1: rs, pc2: L2, pc3: L3, pc4: L4) .
-  eq trans((locked: false, pc1: rs, pc2: L2, pc3: L3, pc4: L4), t1) = 
-    (locked: false, pc1: ms, pc2: L2, pc3: L3, pc4: L4) .
-  eq trans((locked: B, pc1: ms, pc2: L2, pc3: L3, pc4: L4), t1) = 
-    (locked: true, pc1: cs, pc2: L2, pc3: L3, pc4: L4) .
-  eq trans((locked: B, pc1: cs, pc2: L2, pc3: L3, pc4: L4), t1) = 
-    (locked: false, pc1: rs, pc2: L2, pc3: L3, pc4: L4) .
+  eq trans((locked: true,pc1: rs,pc2: L2),t1)
+    = (locked: true,pc1: rs,pc2: L2) .
+  eq trans((locked: false,pc1: rs,pc2: L2),t1)
+    = (locked: false,pc1: ms,pc2: L2) .
+  eq trans((locked: B,pc1: ms,pc2: L2),t1)
+    = (locked: true,pc1: cs,pc2: L2) .
+  eq trans((locked: B,pc1: cs,pc2: L2),t1)
+    = (locked: false,pc1: rs,pc2: L2) .
   -- t2
-  eq trans((locked: true, pc1: L1, pc2: rs, pc3: L3, pc4: L4), t2) = 
-    (locked: true, pc1: L1, pc2: rs, pc3: L3, pc4: L4) .
-  eq trans((locked: false, pc1: L1, pc2: rs, pc3: L3, pc4: L4), t2) = 
-    (locked: false, pc1: L1, pc2: ms, pc3: L3, pc4: L4) .
-  eq trans((locked: B, pc1: L1, pc2: ms, pc3: L3, pc4: L4), t2) = 
-    (locked: true, pc1: L1, pc2: cs, pc3: L3, pc4: L4) .
-  eq trans((locked: B, pc1: L1, pc2: cs, pc3: L3, pc4: L4), t2) = 
-    (locked: false, pc1: L1, pc2: rs, pc3: L3, pc4: L4) .
-  -- t3
-  eq trans((locked: true, pc1: L1, pc2: L2, pc3: rs, pc4: L4), t2) = 
-    (locked: true, pc1: L1, pc2: L2, pc3: rs, pc4: L4) .
-  eq trans((locked: false, pc1: L1, pc2: L2, pc3: rs, pc4: L4), t2) = 
-    (locked: false, pc1: L1, pc2: L2, pc3: ms, pc4: L4) .
-  eq trans((locked: B, pc1: L1, pc2: L2, pc3: ms, pc4: L4), t2) = 
-    (locked: true, pc1: L1, pc2: L2, pc3: cs, pc4: L4) .
-  eq trans((locked: B, pc1: L1, pc2: L2, pc3: cs, pc4: L4), t2) = 
-    (locked: false, pc1: L1, pc2: L2, pc3: rs, pc4: L4) .
-  -- t4
-  eq trans((locked: true, pc1: L1, pc2: L2, pc3: L3, pc4: rs), t2) = 
-    (locked: true, pc1: L1, pc2: L2, pc3: L3, pc4: rs) .
-  eq trans((locked: false, pc1: L1, pc2: L2, pc3: L3, pc4: rs), t2) = 
-    (locked: false, pc1: L1, pc2: L2, pc3: L3, pc4: ms) .
-  eq trans((locked: B, pc1: L1, pc2: L2, pc3: L3, pc4: ms), t2) = 
-    (locked: true, pc1: L1, pc2: L2, pc3: L3, pc4: cs) .
-  eq trans((locked: B, pc1: L1, pc2: L2, pc3: L3, pc4: cs), t2) = 
-    (locked: false, pc1: L1, pc2: L2, pc3: L3, pc4: rs) .
+  eq trans((locked: true,pc1: L1,pc2: rs),t2)
+    = (locked: true,pc1: L1,pc2: rs) .
+  eq trans((locked: false,pc1: L1,pc2: rs),t2)
+    = (locked: false,pc1: L1,pc2: ms) .
+  eq trans((locked: B,pc1: L1,pc2: ms),t2)
+    = (locked: true,pc1: L1,pc2: cs) .
+  eq trans((locked: B,pc1: L1,pc2: cs),t2)
+    = (locked: false,pc1: L1,pc2: rs) .
 }
-
 
 mod! COMP {
   pr(INF-LIST(STATE)
@@ -220,20 +200,8 @@ mod! SCHED {
   vars IL1 IL2 : Sched .
   eq if true then {IL1} else {IL2} = IL1 .
   eq if false then {IL1} else {IL2} = IL2 .
-
   var N : Nat .
-  eq sched(N) = 
-    if 2 divides N 
-    then { t1 | sched(N quo 2) }
-    else { 
-      if 3 divides N 
-      then { t2 | sched(N quo 3) }
-      else {
-        if 5 divides N 
-        then { t3 | sched(N quo 5) }
-        else { t4 | sched(sd(N, 1)) }
-      } 
-    } .
+  eq sched(N) = if 2 divides N then {t1 | sched(N quo 2)} else {t2 | sched(N quo 2)} .
 }
 
 open SCHED .
@@ -242,45 +210,17 @@ open SCHED .
   red take(sched(12345),10) .
 close
 
-mod! SIM {  
-  pr(FMUTEX)  
-  pr(COMP)  
-  pr(SCHED)
+mod! SIM { pr(FMUTEX) pr(COMP) pr(SCHED)
   op sim : State Nat -> Comp .
   op sub-sim : State Sched -> Comp .
-  var S : State .  
-  var N : Nat .  
-  var NzD : NzNat .
-  var T : Tid .  
-  var TIL : Sched .
+  var S : State . var N : Nat . var NzD : NzNat .
+  var T : Tid . var TIL : Sched .
   eq sim(S,N) = sub-sim(S,sched(N)) .
   eq sub-sim(S,T | TIL) = S | sub-sim(trans(S,T),TIL) .
-  op mutex : State -> Bool .
-  vars L1 L2 L3 L4 : Loc .
-  var B : Bool .
-  eq mutex((locked: B, pc1: L1, pc2: L2, pc3: L3, pc4: L4)) = 
-    not (
-      (L1 == cs and L2 == cs) or
-      (L1 == cs and L3 == cs) or
-      (L1 == cs and L4 == cs) or
-      (L2 == cs and L3 == cs) or
-      (L2 == cs and L4 == cs) or
-      (L3 == cs and L4 == cs)
-    ) .
-  op sim-check : State Nat Nat -> FComp .
-  op sub-sim-check : State Sched Nat -> FComp .
-  var D : Nat .  
-  eq sim-check(S,N,D) = sub-sim-check(S,sched(N),D) .
-  eq sub-sim-check(S,T | TIL,0) = S | nil .
-  op if_then{_}else{_} : Bool FComp FComp -> FComp .
-  eq sub-sim-check(S,T | TIL,NzD) = 
-    if mutex(S) 
-    then {S | sub-sim-check(trans(S,T),TIL,p NzD)}
-    else {S | nil} .
 }
 
 open SIM .
-  red take(sim((locked: false,pc1: rs,pc2: rs,pc3: rs,pc4: rs),123),10) .
-  red take(sim((locked: false,pc1: rs,pc2: rs,pc3: rs,pc4: rs),1234),10) .
-  red take(sim((locked: false,pc1: rs,pc2: rs,pc3: rs,pc4: rs),12345),10) .
+  red take(sim((locked: false,pc1: rs,pc2: rs),123),10) .
+  red take(sim((locked: false,pc1: rs,pc2: rs),1234),10) .
+  red take(sim((locked: false,pc1: rs,pc2: rs),12345),10) .
 close
