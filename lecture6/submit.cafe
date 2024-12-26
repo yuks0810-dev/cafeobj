@@ -163,10 +163,12 @@ mod! TID {
   eq if true then {T1} else {T2} = T1 .
   eq if false then {T1} else {T2} = T2 .
 }
-
-mod! FMUTEX { pr(STATE) pr(TID)
+mod! FMUTEX {  
+  pr(STATE)  
+  pr(TID)
   op trans : State Tid -> State .
-  vars L1 L2 L3 L4 : Loc . var B : Bool .
+  vars L1 L2 L3 L4 : Loc .  
+  var B : Bool .
 
   -- t1
   eq trans((locked: true, pc1: rs, pc2: L2, pc3: L3, pc4: L4), t1) = 
@@ -177,6 +179,7 @@ mod! FMUTEX { pr(STATE) pr(TID)
     (locked: true, pc1: cs, pc2: L2, pc3: L3, pc4: L4) .
   eq trans((locked: B, pc1: cs, pc2: L2, pc3: L3, pc4: L4), t1) = 
     (locked: false, pc1: rs, pc2: L2, pc3: L3, pc4: L4) .
+
   -- t2
   eq trans((locked: true, pc1: L1, pc2: rs, pc3: L3, pc4: L4), t2) = 
     (locked: true, pc1: L1, pc2: rs, pc3: L3, pc4: L4) .
@@ -186,26 +189,27 @@ mod! FMUTEX { pr(STATE) pr(TID)
     (locked: true, pc1: L1, pc2: cs, pc3: L3, pc4: L4) .
   eq trans((locked: B, pc1: L1, pc2: cs, pc3: L3, pc4: L4), t2) = 
     (locked: false, pc1: L1, pc2: rs, pc3: L3, pc4: L4) .
-  -- t3
-  eq trans((locked: true, pc1: L1, pc2: L2, pc3: rs, pc4: L4), t2) = 
-    (locked: true, pc1: L1, pc2: L2, pc3: rs, pc4: L4) .
-  eq trans((locked: false, pc1: L1, pc2: L2, pc3: rs, pc4: L4), t2) = 
-    (locked: false, pc1: L1, pc2: L2, pc3: ms, pc4: L4) .
-  eq trans((locked: B, pc1: L1, pc2: L2, pc3: ms, pc4: L4), t2) = 
-    (locked: true, pc1: L1, pc2: L2, pc3: cs, pc4: L4) .
-  eq trans((locked: B, pc1: L1, pc2: L2, pc3: cs, pc4: L4), t2) = 
-    (locked: false, pc1: L1, pc2: L2, pc3: rs, pc4: L4) .
-  -- t4
-  eq trans((locked: true, pc1: L1, pc2: L2, pc3: L3, pc4: rs), t2) = 
-    (locked: true, pc1: L1, pc2: L2, pc3: L3, pc4: rs) .
-  eq trans((locked: false, pc1: L1, pc2: L2, pc3: L3, pc4: rs), t2) = 
-    (locked: false, pc1: L1, pc2: L2, pc3: L3, pc4: ms) .
-  eq trans((locked: B, pc1: L1, pc2: L2, pc3: L3, pc4: ms), t2) = 
-    (locked: true, pc1: L1, pc2: L2, pc3: L3, pc4: cs) .
-  eq trans((locked: B, pc1: L1, pc2: L2, pc3: L3, pc4: cs), t2) = 
-    (locked: false, pc1: L1, pc2: L2, pc3: L3, pc4: rs) .
-}
 
+  -- t3
+  eq trans((locked: true, pc1: L1, pc2: L2, pc3: rs, pc4: L4), t3) = 
+    (locked: true, pc1: L1, pc2: L2, pc3: rs, pc4: L4) .
+  eq trans((locked: false, pc1: L1, pc2: L2, pc3: rs, pc4: L4), t3) = 
+    (locked: false, pc1: L1, pc2: L2, pc3: ms, pc4: L4) .
+  eq trans((locked: B, pc1: L1, pc2: L2, pc3: ms, pc4: L4), t3) = 
+    (locked: true, pc1: L1, pc2: L2, pc3: cs, pc4: L4) .
+  eq trans((locked: B, pc1: L1, pc2: L2, pc3: cs, pc4: L4), t3) = 
+    (locked: false, pc1: L1, pc2: L2, pc3: rs, pc4: L4) .
+
+  -- t4
+  eq trans((locked: true, pc1: L1, pc2: L2, pc3: L3, pc4: rs), t4) = 
+    (locked: true, pc1: L1, pc2: L2, pc3: L3, pc4: rs) .
+  eq trans((locked: false, pc1: L1, pc2: L2, pc3: L3, pc4: rs), t4) = 
+    (locked: false, pc1: L1, pc2: L2, pc3: L3, pc4: ms) .
+  eq trans((locked: B, pc1: L1, pc2: L2, pc3: L3, pc4: ms), t4) = 
+    (locked: true, pc1: L1, pc2: L2, pc3: L3, pc4: cs) .
+  eq trans((locked: B, pc1: L1, pc2: L2, pc3: L3, pc4: cs), t4) = 
+    (locked: false, pc1: L1, pc2: L2, pc3: rs, pc4: L4) .
+}
 
 mod! COMP {
   pr(INF-LIST(STATE)
