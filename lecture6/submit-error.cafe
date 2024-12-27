@@ -202,13 +202,13 @@ mod! FMUTEX {
 
   -- t4
   eq trans((locked: true, pc1: L1, pc2: L2, pc3: L3, pc4: rs), t4) = 
-    (locked: true, pc1: L1, pc2: L2, pc3: L3, pc4: rs) .
+    (locked: true, pc1: L1, pc2: L2, pc3: L3, pc4: L4) .
   eq trans((locked: false, pc1: L1, pc2: L2, pc3: L3, pc4: rs), t4) = 
-    (locked: false, pc1: L1, pc2: L2, pc3: L3, pc4: ms) .
+    (locked: false, pc1: L1, pc2: L2, pc3: L3, pc4: L4) .
   eq trans((locked: B, pc1: L1, pc2: L2, pc3: L3, pc4: ms), t4) = 
-    (locked: true, pc1: L1, pc2: L2, pc3: L3, pc4: cs) .
+    (locked: true, pc1: L1, pc2: L2, pc3: L3, pc4: L4) .
   eq trans((locked: B, pc1: L1, pc2: L2, pc3: L3, pc4: cs), t4) = 
-    (locked: false, pc1: L1, pc2: L2, pc3: L3, pc4: rs) .
+    (locked: false, pc1: L1, pc2: L2, pc3: L3, pc4: L4) .
 }
 
 mod! COMP {

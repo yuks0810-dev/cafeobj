@@ -1,0 +1,60 @@
+mod! TID {
+  [Tid]
+  ops t1 t2 t3 t4 : -> Tid {constr} .
+}
+
+mod! LOC {
+  [Loc]
+  ops rs ms cs ws es ds : -> Loc {constr} .
+}
+
+mod! STATE2 {
+  pr(LOC)
+  [State2]
+  op (locked:_,pc1:_,pc2:_) : Bool Loc Loc -> State2 {constr} .
+}
+
+mod! FMUTEX2 {
+  pr(STATE2)
+  pr(TID)
+  vars L1 L2 : Loc .
+  var B : Bool .
+  -- t1
+  trans [want1] : (locked: false,pc1: rs,pc2: L2)
+  => (locked: false,pc1: ms,pc2: L2) .
+  trans [try1] : (locked: B,pc1: ms,pc2: L2)
+  => (locked: true,pc1: cs,pc2: L2) .
+  trans [exit1] : (locked: B,pc1: cs,pc2: L2)
+  => (locked: false,pc1: rs,pc2: L2) .
+  -- t2
+  trans [want2] : (locked: false,pc1: L1,pc2: rs)
+  => (locked: false,pc1: L1,pc2: ms) .
+  trans [try2] : (locked: B,pc1: L1,pc2: ms)
+  => (locked: true,pc1: L1,pc2: cs) .
+  trans [exit2] : (locked: B,pc1: L1,pc2: cs)
+  => (locked: false,pc1: L1,pc2: rs) .
+}
+
+open FMUTEX2 .
+  red (locked: false, pc1: rs, pc2: rs) =(1,*)=>* (locked: B, pc1: cs, pc2: cs) .
+close
+
+open FMUTEX2 .
+  red (locked: false, pc1: rs, pc2: rs) =(1,*)=>* (locked: B, pc1: cs, pc2: cs) .
+  show path 0-8 .
+close
+
+mod! MULTISET(E :: TRIV) {
+  [Elt.E < MSet]
+  op emp : -> MSet {constr} .
+  op _ _ : MSet MSet -> MSet {constr assoc comm id: emp} .
+}
+
+open MULTISET(NAT) .
+  red (1 2) 3 == 1 (2 3) .
+  red 1 2 == 2 1 .
+  red 1 1 1 2 2 == 1 2 1 1 2 .
+  red emp 1 emp 2 emp 1 emp 1 emp 2 emp .
+  red emp .
+  red emp emp .
+close
