@@ -58,3 +58,129 @@ open MULTISET(NAT) .
   red emp .
   red emp emp .
 close
+
+mod! OCOMP principal-sort OComp {
+  pr(TID)
+  pr(LOC)
+  [OComp]
+  op (pc[_]:_) : Tid Loc -> OComp {constr} .
+  op (locked:_) : Bool -> OComp {constr} .
+}
+
+mod! STATE {
+  pr(MULTISET(OCOMP) * {sort MSet -> OComps})
+  [State]
+  op {_} : OComps -> State {constr} .
+}
+
+mod! FMUTEX {
+  pr(STATE)
+  vars T T1 T2 : Tid .
+  var B : Bool .
+  var OCs : OComps .
+  trans [want] : {(locked: false) (pc[T]: rs) OCs}
+  => {(locked: false) (pc[T]: ms) OCs} .
+  trans [try] : {(locked: B) (pc[T]: ms) OCs}
+  => {(locked: true) (pc[T]: cs) OCs} .
+  trans [exit] : {(locked: B) (pc[T]: cs) OCs}
+  => {(locked: false) (pc[T]: rs) OCs} .
+}
+
+open FMUTEX .
+  red {(locked: false) (pc[t1]: rs) (pc[t2]: rs)}
+  =(1,*)=>* {(pc[T1]: cs) (pc[T2]: cs) OCs} .
+  show path 0-8 .
+close
+
+mod! STATE3 {
+  pr(LOC)
+  [State3]
+  op (locked:_,pc1:_,pc2:_,pc3:_) : Bool Loc Loc Loc -> State3 {constr} .
+}
+
+mod! MUTEX3 {
+  pr(STATE3)
+  pr(TID)
+  vars L1 L2 L3 : Loc .
+  var B : Bool .
+  -- t1
+  trans [try1] : (locked: false,pc1: rs,pc2: L2,pc3: L3) => (locked: true,pc1: cs,pc2: L2,pc3: L3) .
+  trans [exit1] : (locked: B,pc1: cs,pc2: L2,pc3: L3) => (locked: false,pc1: rs,pc2: L2,pc3: L3) .
+  -- t2
+  trans [try2] : (locked: false,pc1: L1,pc2: rs,pc3: L3)
+  => (locked: true,pc1: L1,pc2: cs,pc3: L3) .
+  trans [exit2] : (locked: B,pc1: L1,pc2: cs,pc3: L3)
+  => (locked: false,pc1: L1,pc2: rs,pc3: L3) .
+  -- t3
+  trans [try2] : (locked: false,pc1: L1,pc2: L2,pc3: rs)
+  => (locked: true,pc1: L1,pc2: L2,pc3: cs) .
+  trans [exit2] : (locked: B,pc1: L1,pc2: L2,pc3: cs)
+  => (locked: false,pc1: L1,pc2: L2,pc3: rs) .
+}
+
+open MUTEX3 .
+  red (locked: false, pc1: rs, pc2: rs, pc3: rs)
+    =(1,*)=>* (locked: B, pc1: L1, pc2: L2, pc3: L3)
+    suchThat (L1 == cs and L2 == cs) or 
+           (L1 == cs and L3 == cs) or (L2 == cs and L3 == cs) .
+close
+
+mod! MUTEX {
+  pr(STATE)
+  vars T T1 T2 : Tid .
+  var B : Bool .
+  var OCs : OComps .
+  trans [try] : {(locked: false) (pc[T]: rs) OCs}
+  => {(locked: true) (pc[T]: cs) OCs} .
+  trans [exit] : {(locked: B) (pc[T]: cs) OCs}
+  => {(locked: false) (pc[T]: rs) OCs} .
+}
+
+open MUTEX .
+  red {(locked: false) (pc[t1]: rs) (pc[t2]: rs) (pc[t3]: rs)}
+  =(1,*)=>* {(pc[T1]: cs) (pc[T2]: cs) OCs} .
+close
+
+mod! QUEUE(E :: TRIV) {
+  [Elt.E < Queue]
+  op emq : -> Queue {constr} .
+  op _;_ : Queue Queue -> Queue {constr assoc id: emq} .
+}
+
+mod! OCOMP principal-sort OComp {
+  pr(QUEUE(TID))
+  pr(LOC)
+  [OComp]
+  op (pc[_]:_) : Tid Loc -> OComp {constr} .
+  op (tmp[_]:_) : Tid Queue -> OComp {constr} .
+  op (queue:_) : Queue -> OComp {constr} .
+}
+
+mod! STATE {
+  pr(MULTISET(OCOMP) * {sort MSet -> OComps})
+  [State]
+  op {_} : OComps -> State {constr} .
+}
+
+mod! FQLOCK {
+  pr(STATE)
+  vars T T1 T2 : Tid . vars Q1 Q2 : Queue . var OCs : OComps .
+  trans [want] : {(queue: Q1) (pc[T]: rs) (tmp[T]: Q2) OCs}
+  => {(queue: Q1) (pc[T]: es) (tmp[T]: (Q1 ; T)) OCs} .
+  trans [enq] : {(queue: Q1) (pc[T]: es) (tmp[T]: Q2) OCs}
+  => {(queue: Q2) (pc[T]: ws) (tmp[T]: Q2) OCs} .
+  trans [try] : {(queue: (T ; Q1)) (pc[T]: ws) (tmp[T]: Q2) OCs}
+  => {(queue: (T ; Q1)) (pc[T]: cs) (tmp[T]: Q2) OCs} .
+  trans [deq1] : {(queue: (T1 ; Q1)) (pc[T]: cs) (tmp[T]: Q2) OCs}
+  => {(queue: (T ; Q1)) (pc[T]: ds) (tmp[T]: Q1) OCs} .
+  trans [deq2] : {(queue: emq) (pc[T]: cs) (tmp[T]: Q2) OCs}
+  => {(queue: emq) (pc[T]: ds) (tmp[T]: emq) OCs} .
+  trans [exit] : {(queue: Q1) (pc[T]: ds) (tmp[T]: Q2) OCs}
+  => {(queue: Q2) (pc[T]: rs) (tmp[T]: Q2) OCs} .
+}
+
+open FQLOCK .
+  red {(queue: emq) (pc[t1]: rs) (pc[t2]: rs) (tmp[t1]: emq) (tmp[t2]: emq)}
+  =(1,*)=>* {(pc[T1]: cs) (pc[T2]: cs) OCs} .
+  show path 0-33 .
+close
