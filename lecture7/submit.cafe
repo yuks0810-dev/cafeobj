@@ -249,6 +249,15 @@ open FMUTEX4-WITH-RECORD .
   show path 0-124 .
 close
 
+open MUTEX4-WITH-RECORD .
+  red (locked: false, pc1: rs, pc2: rs, pc3: rs, pc4: rs)
+    =(1,*)=>* (locked: B, pc1: L1, pc2: L2, pc3: L3, pc4: L4)
+    suchThat (L1 == cs and L2 == cs) or (L1 == cs and L3 == cs) or (L1 == cs and L4 == cs)
+          or (L2 == cs and L3 == cs) or (L2 == cs and L4 == cs)
+          or (L3 == cs and L4 == cs) .
+  show path 0-22 .
+close
+
 
 -- 2. Revise four threads participating in the protocol, using the "MULTISET".
 mod! OCOMP-WITH-MULTISET principal-sort OComp {
