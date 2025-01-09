@@ -213,10 +213,11 @@ mod! INTERPRET {
   -- interpret
   eq interpret(S) = eval(S,empEnv).
   -- eval
-  eq eval(S,errEnv) = errEnv .
-  eq eval(estm,EV) = EV .
-  eq eval(V := E ;,EV) = evalAssign(V,evalExp(E,EV),EV) .
-  eq eval(if E {S1} else {S2},EV) = evalIf(evalExp(E,EV),S1,S2,EV) .
+  eq eval(S, errEnv) = errEnv .
+  eq eval(estm, EV) = EV .
+  eq eval(V := E ;, EV) = evalAssign(V, evalExp(E, EV), EV) .
+  eq eval(if E {S1} else {S2}, EV) = evalIf(evalExp(E, EV), S1, S2, EV) .
+  eq eval(S1 S2, EV) = eval(S2, eval(S1, EV)) .
   -- evalAssign
   eq evalAssign(V, errNat, EV) = errEnv .
   eq evalAssign(V, N&E, errEnv) = errEnv .
@@ -246,6 +247,7 @@ mod! INTERPRET {
     = if evalExp(E1,EV) == errNat or evalExp(E2,EV) == errNat
     then { errNat }
     else { if evalExp(E1,EV) == evalExp(E2,EV) then {1} else {0} } .
+  eq eval(S1 S2, EV) = eval(S2, eval(S1, EV)) .
 }
 
 open INTERPRET .
@@ -294,4 +296,7 @@ open INTERPRET .
             }
           } .
   red interpret(p4) .
+
+  -- Interpreting the program p4 returns the environment:
+  -- 29 ((x , 20000000000000000) | ((y , 141421356) | ((z , 141421356) | ((tmp , 141421356) | empEnv)))):Env
 close
