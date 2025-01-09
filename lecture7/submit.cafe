@@ -235,7 +235,7 @@ mod! FMUTEX4-WITH-RECORD {
   trans [try2] : (locked: B, pc1: L1, pc2: ms, pc3: L3, pc4: L4) => (locked: true, pc1: L1, pc2: cs, pc3: L3, pc4: L4) .
   trans [exit2] : (locked: B, pc1: L1, pc2: cs, pc3: L3, pc4: L4) => (locked: false, pc1: L1, pc2: rs, pc3: L3, pc4: L4) .
   -- t3
-  trans  [want3] : (locked: false,pc1: L1, pc2: rs, pc3: L3, pc4: L4) => (locked: false,pc1: L1,pc2: L2,pc3: ms, pc4: L4) .
+  trans [want3] : (locked: false, pc1: L1, pc2: rs, pc3: L3, pc4: L4) => (locked: false, pc1: L1, pc2: rs, pc3: ms, pc4: L4) .
   trans [try3] : (locked: B, pc1: L1, pc2: L2, pc3: ms, pc4: L4) => (locked: true,pc1: L1,pc2: L2,pc3: cs, pc4: L4) .
   trans [exit3] : (locked: B, pc1: L1, pc2: L2, pc3: cs, pc4: L4) => (locked: false, pc1: L1, pc2: L2, pc3: rs, pc4: L4) .
   -- t4
@@ -245,9 +245,45 @@ mod! FMUTEX4-WITH-RECORD {
 }
 
 open FMUTEX4-WITH-RECORD .
-  red (locked: false, pc1: rs, pc2: rs, pc3: rs, pc4: rs) =(1,*)=>* (locked: B, pc1: cs, pc2: cs, pc3: cs, pc4: cs) .
-  show path 0-124 .
+  red (locked: false, pc1: rs, pc2: rs, pc3: rs, pc4: rs)
+  =(1,*)=>* (locked: B, pc1: L1, pc2: L2, pc3: L3, pc4: L4)
+    suchThat (L1 == cs and L2 == cs) or (L1 == cs and L3 == cs) or (L1 == cs and L4 == cs)
+          or (L2 == cs and L3 == cs) or (L2 == cs and L4 == cs)
+          or (L3 == cs and L4 == cs) .
+  show path 0-31 .
 close
+
+
+mod! STATE4 {
+  pr(LOC)
+  [State4]
+  op (locked:_,pc1:_,pc2:_,pc3:_,pc4:_) : Bool Loc Loc Loc Loc -> State4 {constr} .
+}
+
+mod! MUTEX4-WITH-RECORD {
+  pr(STATE4)
+  pr(TID)
+  vars L1 L2 L3 L4 : Loc .
+  var B : Bool .
+  -- t1
+  trans [try1] : (locked: false,pc1: rs,pc2: L2,pc3: L3,pc4: L4) => (locked: true,pc1: cs,pc2: L2,pc3: L3,pc4: L4) .
+  trans [exit1] : (locked: B,pc1: cs,pc2: L2,pc3: L3,pc4: L4) => (locked: false,pc1: rs,pc2: L2,pc3: L3,pc4: L4) .
+  -- t2
+  trans [try2] : (locked: false,pc1: L1,pc2: rs,pc3: L3,pc4: L4)
+  => (locked: true,pc1: L1,pc2: cs,pc3: L3,pc4: L4) .
+  trans [exit2] : (locked: B,pc1: L1,pc2: cs,pc3: L3,pc4: L4)
+  => (locked: false,pc1: L1,pc2: rs,pc3: L3,pc4: L4) .
+  -- t3
+  trans [try3] : (locked: false,pc1: L1,pc2: L2,pc3: rs,pc4: L4)
+  => (locked: true,pc1: L1,pc2: L2,pc3: cs,pc4: L4) .
+  trans [exit3] : (locked: B,pc1: L1,pc2: L2,pc3: cs,pc4: L4)
+  => (locked: false,pc1: L1,pc2: L2,pc3: rs,pc4: L4) .
+  -- t4
+  trans [try4] : (locked: false,pc1: L1,pc2: L2,pc3: L3,pc4: rs)
+  => (locked: true,pc1: L1,pc2: L2,pc3: L3,pc4: cs) .
+  trans [exit4] : (locked: B,pc1: L1,pc2: L2,pc3: L3,pc4: cs)
+  => (locked: false,pc1: L1,pc2: L2,pc3: L3,pc4: rs) .
+}
 
 open MUTEX4-WITH-RECORD .
   red (locked: false, pc1: rs, pc2: rs, pc3: rs, pc4: rs)
@@ -255,7 +291,6 @@ open MUTEX4-WITH-RECORD .
     suchThat (L1 == cs and L2 == cs) or (L1 == cs and L3 == cs) or (L1 == cs and L4 == cs)
           or (L2 == cs and L3 == cs) or (L2 == cs and L4 == cs)
           or (L3 == cs and L4 == cs) .
-  show path 0-22 .
 close
 
 
