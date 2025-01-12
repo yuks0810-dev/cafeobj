@@ -276,7 +276,9 @@ mod! VM {
   eq exec2(bjump(N),IL,PC,Stk,Env) = exec(IL,sd(PC,N),Stk,Env) .
   -- jumpOnCond
   eq exec2(jumpOnCond(N),IL,PC,empstk,Env) = errEnv .
-  eq exec2(jumpOnCond(N),IL,PC,N1 | Stk,Env) = exec(IL, if N1 == 0 then {PC + 1} else {PC + N},Stk,Env) .
+  eq exec2(jumpOnCond(N),IL,PC,N1 | Stk,Env) = 
+    if N1 == 0 then {exec(IL,PC + 1,Stk,Env)}
+    else {exec(IL,PC + N,Stk,Env)} .
   -- quit
   eq exec2(quit,IL,PC,Stk,Env) = Env .
   -- equal
