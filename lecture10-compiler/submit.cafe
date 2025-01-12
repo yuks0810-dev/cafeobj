@@ -299,6 +299,113 @@ mod! INTERPRET {
       = eval(V := E1 ; while V < E2 || V === E2 { S V := V + n(1) ; }, EV) .
 }
 
+view TRIV-ERR2NAT-ERR from TRIV-ERR to NAT-ERR {
+    sort Elt -> Nat,
+    sort Err -> ErrNat,
+    sort Elt&Err -> Nat&Err,
+    op err -> errNat
+}
+
+mod! STACK {
+    pr(LIST(M <= TRIV-ERR2NAT-ERR)
+       * {sort List -> Stack, op nil -> empstk} )
+    [Stack ErrStack < Stack&Err]
+    op errStack : -> ErrStack {constr} .
+    op _|_ : Nat&Err Stack&Err -> Stack&Err .
+    --
+    var S&E : Stack&Err .
+    var N&E : Nat&Err .
+    -- _|_
+    eq errNat | S&E = errStack .
+    eq N&E | errStack = errStack .
+}
+
+mod! VM {
+    pr(ILIST)
+    pr(ENV)
+    pr(STACK)
+    op run : IList -> Env&Err .
+    op exec : IList Nat Stack&Err Env&Err -> Env&Err .
+    op exec2 : Instruct&Err IList Nat Stack&Err Env&Err -> Env&Err .
+    var IL : IList . -- instruction list
+    var PC : Nat . -- program counter
+    var Stk : Stack . -- stack
+    var Env : Env . -- environment
+    vars N N1 N2 : Nat . -- natural numbers
+    var V : Var . -- variable
+    var E&E : Env&Err . -- environment error
+    var S&E : Stack&Err .
+    var I&E : Instruct&Err .
+    -- run
+    eq run(IL) = exec(IL,0,empstk,empEnv) .
+    -- exec
+    eq exec(IL,PC,errStack,E&E) = errEnv .
+    eq exec(IL,PC,S&E,errEnv) = errEnv .
+    eq exec(IL,PC,Stk,Env) = exec2(nth(IL,PC),IL,PC,Stk,Env) .
+    -- exec2
+    -- push
+    eq exec2(push(N),IL,PC,Stk,Env) = exec(IL,PC + 1,N | Stk,Env) .
+    -- load
+    eq exec2(load(V),IL,PC,Stk,Env) = exec(IL,PC + 1,lookup(Env,V) | Stk,Env) .
+    -- store
+    eq exec2(store(V), IL, PC, empstk, Env) = errEnv .
+    eq exec2(store(V),IL,PC,N | Stk,Env) = exec(IL,PC + 1, Stk, update(Env,V,N)) .
+    -- add
+    eq exec2(add,IL,PC,empstk,Env) = errEnv .
+    eq exec2(add,IL,PC,N1 | empstk,Env) = errEnv .
+    eq exec2(add,IL,PC,N2 | N1 | Stk,Env) = exec(IL,PC + 1,N1 + N2 | Stk,Env) .
+    -- multiply
+    eq exec2(multiply,IL,PC,empstk,Env) = errEnv .
+    eq exec2(multiply,IL,PC,N1 | empstk,Env) = errEnv .
+    eq exec2(multiply,IL,PC,N2 | N1 | Stk,Env) = exec(IL,PC + 1,N1 * N2 | Stk,Env) .
+    -- lessThan
+    eq exec2(lessThan,IL,PC,empstk,Env) = errEnv .
+    eq exec2(lessThan,IL,PC,N1 | empstk,Env) = errEnv .
+    eq exec2(lessThan,IL,PC,N2 | N1 | Stk,Env) = exec(IL,PC + 1, (if N1 < N2 then {1} else {0}) | Stk,Env) .
+    -- and
+    eq exec2(and,IL,PC,empstk,Env) = errEnv .
+    eq exec2(and,IL,PC,N1 | empstk,Env) = errEnv .
+    -- Execution of the 'and' command
+    -- Takes the top two values from the stack, computes their logical AND, and returns the result to the stack.
+    -- If either value is 0, the result is 0. Otherwise, the result is 1.
+    -- This logic is based on the property of the AND operation, which returns true (1) only when both operands are true (1).
+    -- The logic is based on the property of the AND operation, which returns true (1) only when both operands are true (1).
+    eq exec2(and,IL,PC,N2 | N1 | Stk,Env) = exec(IL, PC + 1, (if N1 == 0 or N2 == 0 then {0} else {1}) | Stk,Env) .
+
+    -- jump
+    eq exec2(jump(N),IL,PC,Stk,Env) = exec(IL,PC + N,Stk,Env) .
+    -- bjump
+    eq exec2(bjump(N),IL,PC,Stk,Env) = exec(IL,sd(PC,N),Stk,Env) .
+    -- jumpOnCond
+    eq exec2(jumpOnCond(N),IL,PC,empstk,Env) = errEnv .
+    eq exec2(jumpOnCond(N),IL,PC,N1 | Stk,Env) = 
+      if N1 == 0 then {exec(IL,PC + 1,Stk,Env)}
+      else {exec(IL,PC + N,Stk,Env)} .
+    -- quit
+    eq exec2(quit,IL,PC,Stk,Env) = Env .
+    -- equal
+    eq exec2(equal,IL,PC,empstk,Env) = errEnv .
+    eq exec2(equal,IL,PC,N1 | N2 | Stk,Env) = exec(IL,PC + 1, (if N1 == N2 then {1} else {0}) | Stk,Env) .
+    -- notEqual
+    eq exec2(notEqual,IL,PC,empstk,Env) = errEnv .
+    eq exec2(notEqual,IL,PC,N1 | N2 | Stk,Env) = exec(IL,PC + 1, (if N1 =/= N2 then {1} else {0}) | Stk,Env) .
+    -- mod
+    eq exec2(mod,IL,PC,empstk,Env) = errEnv .
+    eq exec2(mod,IL,PC,N1 | N2 | Stk,Env) = exec(IL,PC + 1, N1 rem N2 | Stk,Env) .
+    -- or
+    eq exec2(or,IL,PC,empstk,Env) = errEnv .
+    eq exec2(or,IL,PC,N1 | N2 | Stk,Env) = exec(IL,PC + 1, (if N1 == 0 and N2 == 0 then {0} else {1}) | Stk,Env) .
+    -- minus
+    eq exec2(minus,IL,PC,empstk,Env) = errEnv .
+    eq exec2(minus,IL,PC,N1 | N2 | Stk,Env) = exec(IL,PC + 1, sd(N1,N2) | Stk,Env) .
+    -- divide
+    eq exec2(divide,IL,PC,empstk,Env) = errEnv .
+    eq exec2(divide,IL,PC,N1 | N2 | Stk,Env) = exec(IL,PC + 1, N1 quo N2 | Stk,Env) .
+    -- greaterThan
+    eq exec2(greaterThan,IL,PC,empstk,Env) = errEnv .
+    eq exec2(greaterThan,IL,PC,N1 | N2 | Stk,Env) = exec(IL,PC + 1, (if N1 > N2 then {1} else {0}) | Stk,Env) .
+}
+
 --
 -- - Function compile takes a Minila program and converts it into
 --   an instruction sequence.
@@ -317,28 +424,66 @@ mod! COMPILE {
     var N : Nat .
     var IL : IList .
     -- compile
+    eq compile(S) = generate(S) @ (quit | iln) .
     -- generate
+    -- eq generate(S) = iln .
+    eq generate(V := E;) = genForExp(E) @ (store(V) | iln) .
+    eq generate(if E {S1} else {S2}) =
+        genForExp(E) @
+        (jumpOnCond(2) | iln) @
+        (jump(len(generate(S1)) + 2) | iln) @
+        generate(S1) @
+        (jump(len(generate(S2)) + 1) | iln) @
+        generate(S2) .
+    eq generate(while E {S1}) =
+        genForExp(E) @
+        (jumpOnCond(2) | iln) @
+        (jump(len(generate(S1)) + 2) | iln) @
+        generate(S1) @
+        (bjump(len(genForExp(E)) + len(generate(S1)) + 2) | iln) .
+    eq generate(for V E1 E2 {S1}) =
+        generate(V := E1;) @
+        generate(while V < E2 || V === E2 { S1 V := V + n(1); }) .
+    eq generate(S1 S2) = generate(S1) @ generate(S2) .
     -- genForExp
     eq genForExp(n(N)) = push(N) | iln .
     eq genForExp(V) = load(V) | iln .
-    eq genForExp(E1 + E2) = genForExp(E1) @ genForExp(E2) .
-    eq genForExp(E1 - E2) = genForExp(E1) @ genForExp(E2) .
-    eq genForExp(E1 * E2) = genForExp(E1) @ genForExp(E2) .
-    eq genForExp(E1 / E2) = genForExp(E1) @ genForExp(E2) .
-    eq genForExp(E1 % E2) = genForExp(E1) @ genForExp(E2) .
-    eq genForExp(E1 === E2) = genForExp(E1) @ genForExp(E2) .
-    eq genForExp(E1 =!= E2) = genForExp(E1) @ genForExp(E2) .
-    eq genForExp(E1 < E2) = genForExp(E1) @ genForExp(E2) .
-    eq genForExp(E1 > E2) = genForExp(E1) @ genForExp(E2) .
-    eq genForExp(E1 && E2) = genForExp(E1) @ genForExp(E2) .
-    eq genForExp(E1 || E2) = genForExp(E1) @ genForExp(E2) .
+    eq genForExp(E1 + E2) = genForExp(E1) @ genForExp(E2) @ (add | iln) .
+    eq genForExp(E1 - E2) = genForExp(E1) @ genForExp(E2) @ (minus | iln) .
+    eq genForExp(E1 * E2) = genForExp(E1) @ genForExp(E2) @ (multiply | iln) .
+    eq genForExp(E1 / E2) = genForExp(E1) @ genForExp(E2) @ (divide | iln) .
+    eq genForExp(E1 % E2) = genForExp(E1) @ genForExp(E2) @ (mod | iln) .
+    eq genForExp(E1 === E2) = genForExp(E1) @ genForExp(E2) @ (equal | iln) .
+    eq genForExp(E1 =!= E2) = genForExp(E1) @ genForExp(E2) @ (notEqual | iln) .
+    eq genForExp(E1 < E2) = genForExp(E1) @ genForExp(E2) @ (lessThan | iln) .
+    eq genForExp(E1 > E2) = genForExp(E1) @ genForExp(E2) @ (greaterThan | iln) .
+    eq genForExp(E1 && E2) = genForExp(E1) @ genForExp(E2) @ (and | iln) .
+    eq genForExp(E1 || E2) = genForExp(E1) @ genForExp(E2) @ (or | iln) .
 }
-
-eof
 
 open COMPILE + VM .
     ops x y z tmp : -> Var .
-  
+
+    red genForExp(n(3)) .
+    red genForExp(n(3) + n(4) * n(5)) .
+    red generate(x := n(3) + n(4) * n(5);) .
+    red generate(if n(100) < n(10) {x := x + n(100);} else {x := x - n(21);}) .
+    red generate(if n(100) > n(10) {x := x + n(100);} else {x := x - n(21);}) .
+    red generate(if tmp * tmp > x {z := tmp - n(1) ;} else {y := tmp ;}) .
+    red generate(if ((z - y) % n(2)) === n(0) {tmp := y + (z - y) / n(2) ;} else {tmp := y + ((z - y) / n(2)) + n(1) ;}) .
+    red generate(while y < n(10) || y === n(10) {x := x * y ; y := y + n(1) ;}) .
+    red generate(for y n(1) n(10) {x := y * x ;}) .
+    red generate(x := y * x ; y := y + n(1) ;) .
+    red generate(y := n(1) ; while y < n(10) || y === n(10) { x := y * x ; y := y + n(1) ; }) .
+    
+    op p0 : -> Stm . 
+    eq p0 = x := n(1) ;
+            for y n(1) n(10) {
+              x := y * x ;
+            } .
+    red generate(p0) .
+    red run(compile(p0)) .
+
     op p1 : -> Stm .
     eq p1 = x := n(1) ;
             y := n(1) ;
@@ -346,6 +491,7 @@ open COMPILE + VM .
               x := x * y ;
               y := y + n(1) ;
             } .
+    red compile(p1) .
     red run(compile(p1)) .
 
     op p2 : -> Stm .
@@ -353,6 +499,7 @@ open COMPILE + VM .
             for y n(1) n(10) {
               x := y * x ;
             } .
+    red compile(p2) .
     red run(compile(p2)) .
 
     op p3 : -> Stm .
@@ -363,6 +510,7 @@ open COMPILE + VM .
               x := y ;
               y := z ;
             } .
+    red compile(p3) .
     red run(compile(p3)) .
 
     op p4 : -> Stm .
@@ -381,5 +529,6 @@ open COMPILE + VM .
                 y := tmp ;
               }
             } .
+    red compile(p4) .
     red run(compile(p4)) .
 close
