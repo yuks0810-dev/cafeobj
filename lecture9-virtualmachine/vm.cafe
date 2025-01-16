@@ -26,6 +26,7 @@ mod! NAT-ERR {
   op p_ : Nat&Err -> Nat&Err .
   op _+_ : Nat&Err Nat&Err -> Nat&Err {assoc comm} .
   op _*_ : Nat&Err Nat&Err -> Nat&Err {assoc comm} .
+  op _-_ : Nat&Err Nat&Err -> Nat&Err .
   op sd : Nat&Err Nat&Err -> Nat&Err .
   op _quo_ : Nat&Err Nat&Err -> Nat&Err .
   op _rem_ : Nat&Err Nat&Err -> Nat&Err .
@@ -45,6 +46,7 @@ mod! NAT-ERR {
   -- sd
   eq sd(errNat,N&E) = errNat .
   eq sd(N&E,errNat) = errNat .
+  eq sd(N&E1,N&E2) = N&E1 - N&E2 .
   -- _quo_
   eq N quo 0 = errNat .
   eq errNat quo N&E = errNat .
@@ -219,77 +221,95 @@ mod! ILIST {
 -- - Function exec2 is an auxiliary function of exec.
 --
 mod! VM {
-  pr(ILIST)
-  pr(ENV)
-  pr(STACK)
-  op run : IList -> Env&Err .
-  op exec : IList Nat Stack&Err Env&Err -> Env&Err .
-  op exec2 : Instruct&Err IList Nat Stack&Err Env&Err -> Env&Err .
-  var IL : IList . -- instruction list
-  var PC : Nat . -- program counter
-  var Stk : Stack . -- stack
-  var Env : Env . -- environment
-  vars N N1 N2 : Nat . -- natural numbers
-  var V : Var . -- variable
-  var E&E : Env&Err . -- environment error
-  var S&E : Stack&Err .
-  var I&E : Instruct&Err .
-  -- run
-  eq run(IL) = exec(IL,0,empstk,empEnv) .
-  -- exec
-  eq exec(IL,PC,errStack,E&E) = errEnv .
-  eq exec(IL,PC,S&E,errEnv) = errEnv .
-  eq exec(IL,PC,Stk,Env) = exec2(nth(IL,PC),IL,PC,Stk,Env) .
-  -- exec2
-  -- push
-  eq exec2(push(N),IL,PC,Stk,Env) = exec(IL,PC + 1,N | Stk,Env) .
-  -- load
-  eq exec2(load(V),IL,PC,Stk,Env) = exec(IL,PC + 1,lookup(Env,V) | Stk,Env) .
-  -- store
-  eq exec2(store(V), IL, PC, empstk, Env) = errEnv .
-  eq exec2(store(V),IL,PC,N | Stk,Env) = exec(IL,PC + 1, Stk, update(Env,V,N)) .
-  -- add
-  eq exec2(add,IL,PC,empstk,Env) = errEnv .
-  eq exec2(add,IL,PC,N1 | empstk,Env) = errEnv .
-  eq exec2(add,IL,PC,N2 | N1 | Stk,Env) = exec(IL,PC + 1,N1 + N2 | Stk,Env) .
-  -- multiply
-  eq exec2(multiply,IL,PC,empstk,Env) = errEnv .
-  eq exec2(multiply,IL,PC,N1 | empstk,Env) = errEnv .
-  eq exec2(multiply,IL,PC,N2 | N1 | Stk,Env) = exec(IL,PC + 1,N1 * N2 | Stk,Env) .
-  -- lessThan
-  eq exec2(lessThan,IL,PC,empstk,Env) = errEnv .
-  eq exec2(lessThan,IL,PC,N1 | empstk,Env) = errEnv .
-  eq exec2(lessThan,IL,PC,N2 | N1 | Stk,Env) = exec(IL,PC + 1, (if N1 < N2 then {1} else {0}) | Stk,Env) .
-  -- and
-  eq exec2(and,IL,PC,empstk,Env) = errEnv .
-  eq exec2(and,IL,PC,N1 | empstk,Env) = errEnv .
-  -- Execution of the 'and' command
-  -- Takes the top two values from the stack, computes their logical AND, and returns the result to the stack.
-  -- If either value is 0, the result is 0. Otherwise, the result is 1.
-  -- This logic is based on the property of the AND operation, which returns true (1) only when both operands are true (1).
-  -- The logic is based on the property of the AND operation, which returns true (1) only when both operands are true (1).
-  eq exec2(and,IL,PC,N2 | N1 | Stk,Env) = exec(IL, PC + 1, (if N1 == 0 or N2 == 0 then {0} else {1}) | Stk,Env) .
+    pr(ILIST)
+    pr(ENV)
+    pr(STACK)
+    op run : IList -> Env&Err .
+    op exec : IList Nat Stack&Err Env&Err -> Env&Err .
+    op exec2 : Instruct&Err IList Nat Stack&Err Env&Err -> Env&Err .
+    var IL : IList . -- instruction list
+    var PC : Nat . -- program counter
+    var Stk : Stack . -- stack
+    var Env : Env . -- environment
+    vars N N1 N2 : Nat . -- natural numbers
+    var V : Var . -- variable
+    var E&E : Env&Err . -- environment error
+    var S&E : Stack&Err .
+    var I&E : Instruct&Err .
+    -- run
+    eq run(IL) = exec(IL,0,empstk,empEnv) .
+    -- exec
+    eq exec(IL,PC,errStack,E&E) = errEnv .
+    eq exec(IL,PC,S&E,errEnv) = errEnv .
+    eq exec(IL,PC,Stk,Env) = exec2(nth(IL,PC),IL,PC,Stk,Env) .
+    -- exec2
+    -- push
+    eq exec2(push(N),IL,PC,Stk,Env) = exec(IL,PC + 1,N | Stk,Env) .
+    -- load
+    eq exec2(load(V),IL,PC,Stk,Env) = exec(IL,PC + 1,lookup(Env,V) | Stk,Env) .
+    -- store
+    eq exec2(store(V), IL, PC, empstk, Env) = errEnv .
+    eq exec2(store(V),IL,PC,N | Stk,Env) = exec(IL,PC + 1, Stk, update(Env,V,N)) .
+    -- add
+    eq exec2(add,IL,PC,empstk,Env) = errEnv .
+    eq exec2(add,IL,PC,N1 | empstk,Env) = errEnv .
+    eq exec2(add,IL,PC,N2 | N1 | Stk,Env) = exec(IL,PC + 1,N1 + N2 | Stk,Env) .
+    -- multiply
+    eq exec2(multiply,IL,PC,empstk,Env) = errEnv .
+    eq exec2(multiply,IL,PC,N1 | empstk,Env) = errEnv .
+    eq exec2(multiply,IL,PC,N2 | N1 | Stk,Env) = exec(IL,PC + 1,N1 * N2 | Stk,Env) .
+    -- lessThan
+    eq exec2(lessThan,IL,PC,empstk,Env) = errEnv .
+    eq exec2(lessThan,IL,PC,N1 | empstk,Env) = errEnv .
+    eq exec2(lessThan,IL,PC,N2 | N1 | Stk,Env) = exec(IL,PC + 1, (if N1 < N2 then {1} else {0}) | Stk,Env) .
+    -- and
+    eq exec2(and,IL,PC,empstk,Env) = errEnv .
+    eq exec2(and,IL,PC,N1 | empstk,Env) = errEnv .
+    -- Execution of the 'and' command
+    -- Takes the top two values from the stack, computes their logical AND, and returns the result to the stack.
+    -- If either value is 0, the result is 0. Otherwise, the result is 1.
+    -- This logic is based on the property of the AND operation, which returns true (1) only when both operands are true (1).
+    -- The logic is based on the property of the AND operation, which returns true (1) only when both operands are true (1).
+    eq exec2(and,IL,PC,N2 | N1 | Stk,Env) = exec(IL, PC + 1, (if N1 == 0 or N2 == 0 then {0} else {1}) | Stk,Env) .
 
-  -- jump
-  eq exec2(jump(N),IL,PC,Stk,Env) = exec(IL,PC + N,Stk,Env) .
-  -- bjump
-  eq exec2(bjump(N),IL,PC,Stk,Env) = exec(IL,sd(PC,N),Stk,Env) .
-  -- jumpOnCond
-  eq exec2(jumpOnCond(N),IL,PC,empstk,Env) = errEnv .
-  eq exec2(jumpOnCond(N),IL,PC,N1 | Stk,Env) = 
-    if N1 == 0 then {exec(IL,PC + 1,Stk,Env)}
-    else {exec(IL,PC + N,Stk,Env)} .
-  -- quit
-  eq exec2(quit,IL,PC,Stk,Env) = Env .
-  -- equal
-  eq exec2(equal,IL,PC,empstk,Env) = errEnv .
-  eq exec2(equal,IL,PC,N1 | N2 | Stk,Env) = exec(IL,PC + 1, (if N1 == N2 then {1} else {0}) | Stk,Env) .
-  
+    -- jump
+    eq exec2(jump(N),IL,PC,Stk,Env) = exec(IL,PC + N,Stk,Env) .
+    -- bjump
+    eq exec2(bjump(N),IL,PC,Stk,Env) = exec(IL, sd(PC,N),Stk,Env) .
+    -- jumpOnCond
+    eq exec2(jumpOnCond(N),IL,PC,empstk,Env) = errEnv .
+    eq exec2(jumpOnCond(N),IL,PC,N1 | Stk,Env) = 
+      if N1 == 0 then {exec(IL,PC + 1,Stk,Env)}
+      else {exec(IL,PC + N,Stk,Env)} .
+    -- quit
+    eq exec2(quit,IL,PC,Stk,Env) = Env .
+    -- equal
+    eq exec2(equal,IL,PC,empstk,Env) = errEnv .
+    eq exec2(equal,IL,PC,N1 | N2 | Stk,Env) = exec(IL,PC + 1, (if N1 == N2 then {1} else {0}) | Stk,Env) .
+    -- notEqual
+    eq exec2(notEqual,IL,PC,empstk,Env) = errEnv .
+    eq exec2(notEqual,IL,PC,N1 | N2 | Stk,Env) = exec(IL,PC + 1, (if N1 == N2 then {0} else {1}) | Stk,Env) .
+    -- mod
+    eq exec2(mod,IL,PC,empstk,Env) = errEnv .
+    eq exec2(mod,IL,PC,N1 | empstk,Env) = errEnv .
+    eq exec2(mod,IL,PC,N2 | N1 | Stk,Env) = exec(IL,PC + 1, N1 rem N2 | Stk,Env) .
+    -- or
+    eq exec2(or,IL,PC,empstk,Env) = errEnv .
+    eq exec2(or,IL,PC,N1 | N2 | Stk,Env) = exec(IL,PC + 1, (if N1 == 0 and N2 == 0 then {0} else {1}) | Stk,Env) .
+    -- minus
+    eq exec2(minus,IL,PC,empstk,Env) = errEnv .
+    eq exec2(minus,IL,PC,N1 | N2 | Stk,Env) = exec(IL,PC + 1, sd(N1,N2) | Stk,Env) .
+    -- divide
+    eq exec2(divide,IL,PC,empstk,Env) = errEnv .
+    eq exec2(divide,IL,PC,N1 | N2 | Stk,Env) = exec(IL,PC + 1, N2 quo N1 | Stk,Env) .
+    -- greaterThan
+    eq exec2(greaterThan,IL,PC,empstk,Env) = errEnv .
+    eq exec2(greaterThan,IL,PC,N2 | N1 | Stk,Env) = exec(IL,PC + 1, (if N1 > N2 then {1} else {0}) | Stk,Env) .
 }
 
 open VM .
-  ops x y z : -> Var .
-  ops il1 il2 : -> IList .
+  ops x y z tmp a : -> Var .
+  ops il1 il2 il3 il4 il5 il6 il7 il8 il9 il10 il11 il12 il13 il14 il15 il16 il17 il18 il19 il20 il21 il22 il23 il24 il25 il26 il27 il28 il29 il30 il31 il32 : -> IList .
   eq il1 = push(1) | store(x) | push(2) | store (y) | load(y) | load(y) | multiply |
            store(y) | load(x) | push(2) | multiply | store(x) | push(16) | load(x) |
            equal | jumpOnCond(2) | bjump(12) | quit | iln .
@@ -301,5 +321,115 @@ open VM .
           store(y)| load(x) | push(2) | multiply | store(x) | push(64) | load(x) |
           equal | jumpOnCond(2) | bjump(12) | quit | iln .
   red run(il2) .
-close
 
+  -- test while
+  eq il4 = push(10) | store(y) | push(0) | store(z) | load(y) | load(z) | notEqual | jumpOnCond(2) | jump(5) |
+          load(z) | push(1) | add | store(z) | bjump(10) | quit | iln .
+  red run(il4) . -- y = 10, z = 10
+
+  -- test minus
+  eq il5 = push(5) | store(x) | push(3) | store(y) | load(x) | load(y) | minus | store(z) | quit | iln .
+  red run(il5) . -- x = 5, y = 3, z = 2
+  -- test notEqual
+  eq il6 = push(5) | store(x) | push(3) | store(y) | load(x) | load(y) | notEqual | store(z) | quit | iln .
+  red run(il6) . -- x = 5, y = 3, z = 1 (5 != 3)
+
+  -- test jumpOnCond
+  eq il7 = push(5) | store(x) | push(3) | store(y) | load(x) | load(y) | equal | jumpOnCond(2) | push(1) | store(z) | jump(2) | push(0) | store(z) | quit | iln .
+  red run(il7) . -- x = 5, y = 3, z = 0 (5 != 3)
+
+  eq il8 = push(5) | store(x) | push(5) | store(y) | load(x) | load(y) | equal | jumpOnCond(2) | push(1) | store(z) | jump(2) | push(0) | store(z) | quit | iln .
+  red run(il8) . -- x = 5, y = 5, z = 1 (5 == 5)
+
+  eq il9 = push(1) | store(x) | push(2) | store (y) | load(y) | load(y) | multiply |
+          store(y) | load(x) | push(2) | multiply | store(x) | push(16) | load(x) |
+          equal | jumpOnCond(2) | bjump(12) | quit | iln . 
+  red run(il9) .
+
+  -- test jump
+  eq il10 = push(5) | store(x) | push(3) | store(y) | jump(4) | push(1) | store(z) | jump(2) | push(0) | store(z) | quit | iln .
+  red run(il10) . -- x = 5, y = 3, z = 0 (jump skips the first store(z))
+
+  eq il11 = push(5) | store(x) | push(3) | store(y) | jump(6) | push(1) | store(z) | jump(2) | push(0) | store(z) | quit | iln .
+  red run(il11) . -- x = 5, y = 3, z = 0 (jump skips both store(z))
+
+  eq il12 = push(5) | store(x) | push(3) | store(y) | jump(4) | push(1) | push(1) | push(100) | push(100) | quit | iln .
+  red run(il12) . -- x = 5, y = 3, z = 1 (jump skips the quit)
+
+  -- test mod
+  eq il13 = push(10) | store(x) | push(3) | store(y) | load(x) | load(y) | mod | store(z) | quit | iln .
+  red run(il13) . -- x = 10, y = 3, z = 1 (10 % 3 = 1)
+
+  eq il14 = push(20) | store(x) | push(4) | store(y) | load(x) | load(y) | mod | store(z) | quit | iln .
+  red run(il14) . -- x = 20, y = 4, z = 0 (20 % 4 = 0)
+
+  eq il15 = push(15) | store(x) | push(6) | store(y) | load(x) | load(y) | mod | store(z) | quit | iln .
+  red run(il15) . -- x = 15, y = 6, z = 3 (15 % 6 = 3)
+
+  eq il16 = push(9) | store(x) | push(2) | store(y) | load(x) | load(y) | mod | store(z) | quit | iln .
+  red run(il16) . -- x = 9, y = 2, z = 1 (9 % 2 = 1)
+
+  eq il17 = push(7) | store(x) | push(5) | store(y) | load(x) | load(y) | mod | store(z) | quit | iln .
+  red run(il17) . -- x = 7, y = 5, z = 2 (7 % 5 = 2)
+
+  -- test divide
+  eq il18 = push(10) | store(x) | push(2) | store(y) | load(x) | load(y) | divide | store(z) | quit | iln .
+  red run(il18) . -- x = 10, y = 2, z = 5 (10 / 2 = 5)
+
+  eq il19 = push(20) | store(x) | push(4) | store(y) | load(x) | load(y) | divide | store(z) | quit | iln .
+  red run(il19) . -- x = 20, y = 4, z = 5 (20 / 4 = 5)
+
+  eq il20 = push(15) | store(x) | push(3) | store(y) | load(x) | load(y) | divide | store(z) | quit | iln .
+  red run(il20) . -- x = 15, y = 3, z = 5 (15 / 3 = 5)
+
+  eq il21 = push(9) | store(x) | push(3) | store(y) | load(x) | load(y) | divide | store(z) | quit | iln .
+  red run(il21) . -- x = 9, y = 3, z = 3 (9 / 3 = 3)
+
+  eq il22 = push(7) | store(x) | push(1) | store(y) | load(x) | load(y) | divide | store(z) | quit | iln .
+  red run(il22) . -- x = 7, y = 1, z = 7 (7 / 1 = 7)
+
+  -- test multiply
+  eq il23 = push(2) | store(x) | push(3) | store(y) | load(x) | load(y) | multiply | store(z) | quit | iln .
+  red run(il23) . -- x = 2, y = 3, z = 6 (2 * 3 = 6)
+
+  eq il24 = push(4) | store(x) | push(5) | store(y) | load(x) | load(y) | multiply | store(z) | quit | iln .
+  red run(il24) . -- x = 4, y = 5, z = 20 (4 * 5 = 20)
+
+  eq il25 = push(6) | store(x) | push(7) | store(y) | load(x) | load(y) | multiply | store(z) | quit | iln .
+  red run(il25) . -- x = 6, y = 7, z = 42 (6 * 7 = 42)
+
+  eq il26 = push(8) | store(x) | push(9) | store(y) | load(x) | load(y) | multiply | store(z) | quit | iln .
+  red run(il26) . -- x = 8, y = 9, z = 72 (8 * 9 = 72)
+
+  eq il27 = push(10) | store(x) | push(11) | store(y) | load(x) | load(y) | multiply | store(z) | quit | iln .
+  red run(il27) . -- x = 10, y = 11, z = 110 (10 * 11 = 110)
+
+  -- test greaterThan
+  eq il28 = push(10) | store(x) | push(2) | store(y) | load(x) | load(y) | greaterThan | store(z) | quit | iln .
+  red run(il28) . -- x = 10, y = 2, z = 1 (10 > 2 = 1)
+
+  eq il29 = push(20) | store(x) | push(20) | store(y) | load(x) | load(y) | greaterThan | store(z) | quit | iln .
+  red run(il29) . -- x = 20, y = 20, z = 0 (20 > 20 = 0)
+
+  eq il30 = push(15) | store(x) | push(30) | store(y) | load(x) | load(y) | greaterThan | store(z) | quit | iln .
+  red run(il30) . -- x = 15, y = 30, z = 0 (15 > 30 = 0)
+
+  eq il31 = push(9) | store(x) | push(3) | store(y) | load(x) | load(y) | greaterThan | store(z) | quit | iln .
+  red run(il31) . -- x = 9, y = 3, z = 1 (9 > 3 = 1)
+
+  eq il32 = push(7) | store(x) | push(10) | store(y) | load(x) | load(y) | greaterThan | store(z) | quit | iln .
+  red run(il32) . -- x = 7, y = 10, z = 0 (7 > 10 = 0)
+
+  eq il3 = push(20000000000000000) | store(x) | push(0) | store(y) | load(x) | store(z) |
+      load(y) | load(z) | notEqual | jumpOnCond(2) | jump(44) |
+      load(z) | load(y) | minus | push(2) |
+      mod | push(0) | equal | jumpOnCond(2) | jump(10) |
+      load(y) | load(z) | load(y) | minus |
+      push(2) | divide | add | store(tmp) | jump(11) |
+      load(y) | load(z) | load(y) | minus |
+      push(2) | divide | add | push(1) | add | store(tmp) |
+      load(tmp) | load(tmp) | multiply | load(x) | greaterThan | jumpOnCond(2) | jump(6) |
+      load(tmp) | push(1) | minus | store(z) |
+      jump(3) | load(tmp) | store(y) | bjump(47) | quit | iln .
+  red run(il3) .
+close
