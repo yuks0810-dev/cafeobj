@@ -152,12 +152,12 @@ open PNAT2-D*O+ .
     :goal { eq [assoc*] : (X * Y) * Z = X * (Y * Z) . }
     :ind on (X:PNat)
     :apply (si)
-    -- I. Base case
+    -- -- I. Base case
     :apply (tc)
     :apply (rd)
-    -- II. Induction case
+    -- -- II. Induction case
     :apply (tc)
-    :apply (rd)
+    -- :apply (rd)
 close
 -- "End of Proof of Theorem 3"
 
@@ -191,6 +191,58 @@ open PNAT2 .
 close
 -- "End of Proof of Lemma 5"
 
+mod! PNAT2-RZRS* {
+    pr(PNAT2)
+    vars X Y : PNat .
+    eq X * 0 = 0 .
+    eq X * s(Y) = (X * Y) + X .
+}
+
+-- "Theorem 4. [Commutativity of _*_ (comm*)]
+-- X * Y = Y * X
+-- Proof. By induction on X."
+open PNAT2-RZRS* .
+    :goal { eq [comm*] : X * Y = Y * X . }
+    :ind on (X:PNat)
+    :apply (si)
+    -- I. Base case
+    :apply (tc)
+    :apply (rd)
+    -- II. Induction case
+    :apply (tc)
+    :apply (rd)
+close
+-- "End of Proof of Theorem 4"
+
+
+mod! PNAT3 {
+    [PNat]
+    op 0 : -> PNat {constr} .
+    op s : PNat -> PNat {constr} .
+    vars X Y Z : PNat .
+    eq (0 = s(Y)) = false .
+    eq (s(X) = s(Y)) = (X = Y) .
+
+    op _+_ : PNat PNat -> PNat .
+    eq 0 + Y = Y . 
+    eq s(X) + Y = s(X + Y) .
+
+    op _*_ : PNat PNat -> PNat . 
+    eq 0 * Y = 0 .
+    eq s(X) * Y = (X * Y) + Y . 
+
+    op sfact2 : PNat PNat -> PNat .
+    eq sfact2(0,Y) = Y . 
+    eq sfact2(s(X),Y) = sfact2(X,s(X) * Y) .
+}
+
+
+mod! PNAT3-D*O+ {
+    pr(PNAT3)
+    vars X Y Z : PNat .
+    eq (X + Y) * Z = (X * Z) + (Y * Z) .
+}
+
 mod! LIST1 (E :: TRIV) {
     [List]
     op nil : -> List {constr}
@@ -203,14 +255,30 @@ mod! LIST1 (E :: TRIV) {
     vars L1 L2 L3 : List .
     eq (nil = E | L1) = false .
     eq (E | L1 = E2 | L2) = (E = E2) and (L1 = L2) .
-    eq nil @ L2 = L2 . -- (@1)
-    eq (E | L1) @ L2 = E | (L1 @ L2) . -- (@2)
-    eq rev1(nil) = nil . -- (r1-1)
-    eq rev1(E | L1) = rev1(L1) @ (E | nil) . -- (r1-2)
-    eq rev2(L1) = sr2(L1,nil) . -- (r2)
-    eq sr2(nil,L2) = L2 . -- (sr2-1)
-    eq sr2(E | L1,L2) = sr2(L1,E | L2) . -- (sr2-2)
+    eq nil @ L2 = L2 .
+    eq (E | L1) @ L2 = E | (L1 @ L2) .
+    eq rev1(nil) = nil .
+    eq rev1(E | L1) = rev1(L1) @ (E | nil) .
+    eq rev2(L1) = sr2(L1,nil) .
+    eq sr2(nil,L2) = L2 .
+    eq sr2(E | L1,L2) = sr2(L1,E | L2) .
 }
+
+-- "Lemma 6 [Property of sfact2 (sf2-p)]
+-- Y * sfact2(X,Z) = sfact2(X,Y * Z)
+-- Proof. By induction on X."
+open PNAT3-D*O+ .
+    :goal { eq [sf2-p] : Y * sfact2(X,Z) = sfact2(X, Y * Z) . }
+    :ind on (X:PNat)
+    :apply (si)
+    -- I. Base case
+    :apply (tc)
+    :apply (rd)
+    -- II. Induction case
+    :apply (tc)
+    :apply (rd)
+close
+-- "End of Proof of Lemma 6"
 
 -- "Theorem 7. [Associativity of _@_ (assoc@)]
 -- (L1 @ L2) @ L3 = L1 @ (L2 @ L3)
